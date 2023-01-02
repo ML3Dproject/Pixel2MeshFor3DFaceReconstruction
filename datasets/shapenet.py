@@ -18,41 +18,47 @@ class ShapeNet(BaseDataset):
     """
 
     def __init__(self, file_root, file_list_name, mesh_pos, normalization, shapenet_options):
+        #file root is --datasets/data/shapenet
+        # dataset root
+        #   # DATASET_ROOT = "datasets/data"
+        # SHAPENET_ROOT = os.path.join(DATASET_ROOT, "shapenet")#examples
+        # IMAGENET_ROOT = os.path.join(DATASET_ROOT, "imagenet")
+
         super().__init__()
-        self.file_root = file_root
+        self.file_root = file_root  #use in base.py file --config.SHAPENET_ROOT
         with open(os.path.join(self.file_root, "meta", "shapenet.json"), "r") as fp:
-            self.labels_map = sorted(list(json.load(fp).keys()))
-        self.labels_map = {k: i for i, k in enumerate(self.labels_map)}
+            self.labels_map = sorted(list(json.load(fp).keys()))#after load, the output is a dictionary,sort operate on the list only, sorted can work on dictionary
+        self.labels_map = {k: i for i, k in enumerate(self.labels_map)}#self.labels_map,i = 0 1 2 3 ...?
         # Read file list
         with open(os.path.join(self.file_root, "meta", file_list_name + ".txt"), "r") as fp:
-            self.file_names = fp.read().split("\n")[:-1]
+            self.file_names = fp.read().split("\n")[:-1] #divide by the space!!
         self.tensorflow = "_tf" in file_list_name # tensorflow version of data
-        self.normalization = normalization
-        self.mesh_pos = mesh_pos
-        self.resize_with_constant_border = shapenet_options.resize_with_constant_border
+        self.normalization = normalization#options.dataset.normalization = True
+        self.mesh_pos = mesh_pos#options.dataset.mesh_pos = [0., 0., -0.8]
+        self.resize_with_constant_border = shapenet_options.resize_with_constant_border#use edict to access the key, False
 
     def __getitem__(self, index):
-        if self.tensorflow:
-            filename = self.file_names[index][17:]
-            label = filename.split("/", maxsplit=1)[0]
+        if self.tensorflow:#if is the official
+            filename = self.file_names[index][17:]#04256520/cc644fad0b76a441d84c7dc40ac6d743/rendering/02.dat
+            label = filename.split("/", maxsplit=1)[0]#maxsplit=1 ,divide into two parts 04256520
             pkl_path = os.path.join(self.file_root, "data_tf", filename)
-            img_path = pkl_path[:-4] + ".png"
+            img_path = pkl_path[:-4] + ".png"#get rid of the .dat
             with open(pkl_path) as f:
-                data = pickle.load(open(pkl_path, 'rb'), encoding="latin1")
-            pts, normals = data[:, :3], data[:, 3:]
-            img = io.imread(img_path)
-            img[np.where(img[:, :, 3] == 0)] = 255
+                data = pickle.load(open(pkl_path, 'rb'), encoding="latin1")#transfer to python files, 'latin1' is the encoder method to the binary file and python object
+            pts, normals = data[:, :3], data[:, 3:]#dat文件中，前三项目存储该点坐标数值，后三个为该点的normal vector数值
+            img = io.imread(img_path)#137*137*4，α channel 不透明度
+            img[np.where(img[:, :, 3] == 0)] = 255# why ==0 to 255?? if have values, it ranges in 0-255
             if self.resize_with_constant_border:
                 img = transform.resize(img, (config.IMG_SIZE, config.IMG_SIZE),
-                                       mode='constant', anti_aliasing=False)  # to match behavior of old versions
+                                       mode='constant', anti_aliasing=False)  # to match behavior of old version,224*224
             else:
                 img = transform.resize(img, (config.IMG_SIZE, config.IMG_SIZE))
-            img = img[:, :, :3].astype(np.float32)
+            img = img[:, :, :3].astype(np.float32)#4个channels
         else:
             label, filename = self.file_names[index].split("_", maxsplit=1)
             with open(os.path.join(self.file_root, "data", label, filename), "rb") as f:
-                data = pickle.load(f, encoding="latin1")
-            img, pts, normals = data[0].astype(np.float32) / 255.0, data[1][:, :3], data[1][:, 3:]
+                data = pickle.load(f, encoding="latin1")#transfer to python files, 'latin1' is the encoder method to the binary file and python object
+            img, pts, normals = data[0].astype(np.float32) / 255.0, data[1][:, :3], data[1][:, 3:]#存储方式不一样，另一种不分开，直接存储，取的时候分两个channels
 
         pts -= np.array(self.mesh_pos)
         assert pts.shape[0] == normals.shape[0]
@@ -63,12 +69,12 @@ class ShapeNet(BaseDataset):
 
         return {
             "images": img_normalized,
-            "images_orig": img,
-            "points": pts,
-            "normals": normals,
-            "labels": self.labels_map[label],
-            "filename": filename,
-            "length": length
+            "images_orig": img,#image matrix, without 0 (is 255)
+            "points": pts,#every points
+            "normals": normals,#the normal vector of every points
+            "labels": self.labels_map[label],# 0-12, class = 13
+            "filename": filename,#"04256520/cc644fad0b76a441d84c7dc40ac6d743/rendering/02.dat"
+            "length": length#8678
         }
 
     def __len__(self):
@@ -77,7 +83,7 @@ class ShapeNet(BaseDataset):
 
 class ShapeNetImageFolder(BaseDataset):
 
-    def __init__(self, folder, normalization, shapenet_options):
+    def __init__(self, folder, normalization, shapenet_options):#folder:"/tmp"
         super().__init__()
         self.normalization = normalization
         self.resize_with_constant_border = shapenet_options.resize_with_constant_border
@@ -118,9 +124,9 @@ class ShapeNetImageFolder(BaseDataset):
 
     def __len__(self):
         return len(self.file_list)
+#the methods are same as the before, just to demo the process of image processing
 
-
-def get_shapenet_collate(num_points):
+def get_shapenet_collate(num_points):#num_points = 3000
     """
     :param num_points: This option will not be activated when batch size = 1
     :return: shapenet_collate function
@@ -129,7 +135,7 @@ def get_shapenet_collate(num_points):
         if len(batch) > 1:
             all_equal = True
             for t in batch:
-                if t["length"] != batch[0]["length"]:
+                if t["length"] != batch[0]["length"]:#the number of the points in an example
                     all_equal = False
                     break
             points_orig, normals_orig = [], []
@@ -149,5 +155,5 @@ def get_shapenet_collate(num_points):
         ret["points_orig"] = ret["points"]
         ret["normals_orig"] = ret["normals"]
         return ret
-
+  # the purpose is to make sure all batchs have same number of points, if not, it will change it to same 3000, else:default
     return shapenet_collate

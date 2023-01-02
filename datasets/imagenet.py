@@ -10,7 +10,7 @@ from PIL import ImageFile, Image
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 
-class ImageNet(Dataset):
+class ImageNet(Dataset):#we don't have the folder of ImageNet...
 
     def __init__(self, root_dir, split="train"):
         self.image_dir = os.path.join(root_dir, split)
@@ -23,7 +23,7 @@ class ImageNet(Dataset):
                 self.labels.append(int(label))
 
         self.normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                                              std=[0.229, 0.224, 0.225])
+                                              std=[0.229, 0.224, 0.225])#to =1~1
         if split == "train":
             self.transform = transforms.Compose([
                 transforms.RandomResizedCrop(224),
