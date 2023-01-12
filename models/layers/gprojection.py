@@ -90,13 +90,16 @@ class GProjection(nn.Module):
             w = torch.clamp(w, min=-1, max=1)
             h = torch.clamp(h, min=-1, max=1)
 
+        #inputs: [batch_size x pts_num x 3]???
+        #依据论文应该是[batch_size x pts_num x 128]
         feats = [inputs]
         for img_feature in img_features:
+            #依次遍历[img2, img3, img4, img5]的feature
             feats.append(self.project(resolution, img_feature, torch.stack([w, h], dim=-1)))
 
         output = torch.cat(feats, 2)
 
-        return output
+        return output #963
 
     def project(self, img_shape, img_feat, sample_points):
         """
@@ -112,7 +115,9 @@ class GProjection(nn.Module):
             output = torch.stack([self.project_tensorflow(points_h[i], points_w[i],
                                                           feature_shape, img_feat[i]) for i in range(img_feat.size(0))], 0)
         else:
+            #[batch_size x 1 x num_points x 2]
             output = F.grid_sample(img_feat, sample_points.unsqueeze(1))
+            #此时output [batch_size x feat_dim x 1 x num_points]
             output = torch.transpose(output.squeeze(2), 1, 2)
-
+            #此时output [batch_size x num_points x feat_dim]
         return output

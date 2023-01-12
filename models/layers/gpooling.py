@@ -12,12 +12,13 @@ class GUnpooling(nn.Module):
 
     def __init__(self, unpool_idx):
         super(GUnpooling, self).__init__()
-        self.unpool_idx = unpool_idx
+        self.unpool_idx = unpool_idx #462*2， 1848*2
         # save dim info
         self.in_num = torch.max(unpool_idx).item()
         self.out_num = self.in_num + len(unpool_idx)
 
     def forward(self, inputs):
+        #unpooling_index可能存储edge的两个顶点
         new_features = inputs[:, self.unpool_idx].clone()
         new_vertices = 0.5 * new_features.sum(2)
         output = torch.cat([inputs, new_vertices], 1)

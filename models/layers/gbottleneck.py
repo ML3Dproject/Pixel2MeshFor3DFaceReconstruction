@@ -25,7 +25,7 @@ class GResBlock(nn.Module):
 
 
 class GBottleneck(nn.Module):
-
+    
     def __init__(self, block_num, in_dim, hidden_dim, out_dim, adj_mat, activation=None):
         super(GBottleneck, self).__init__()
 
@@ -37,10 +37,14 @@ class GBottleneck(nn.Module):
         self.activation = F.relu if activation else None
 
     def forward(self, inputs):
+        #inputs batchsize*pts*963
         x = self.conv1(inputs)
+        #此时x batchsize*pts*192
+        #True
         if self.activation:
             x = self.activation(x)
         x_hidden = self.blocks(x)
         x_out = self.conv2(x_hidden)
 
+        #x_out是新的vertex坐标dimension=3, x_hidden是新的feature
         return x_out, x_hidden

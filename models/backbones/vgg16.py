@@ -89,20 +89,20 @@ class VGG16P2M(nn.Module):
 
         self.conv2_1 = nn.Conv2d(32, 64, 3, stride=2, padding=1)  # 112 -> 56
         self.conv2_2 = nn.Conv2d(64, 64, 3, stride=1, padding=1)
-        self.conv2_3 = nn.Conv2d(64, 64, 3, stride=1, padding=1)
+        self.conv2_3 = nn.Conv2d(64, 64, 3, stride=1, padding=1)  #56 * 56 * 64
 
         self.conv3_1 = nn.Conv2d(64, 128, 3, stride=2, padding=1)  # 56 -> 28
         self.conv3_2 = nn.Conv2d(128, 128, 3, stride=1, padding=1)
-        self.conv3_3 = nn.Conv2d(128, 128, 3, stride=1, padding=1)
+        self.conv3_3 = nn.Conv2d(128, 128, 3, stride=1, padding=1)  #28 * 28 * 128
 
         self.conv4_1 = nn.Conv2d(128, 256, 5, stride=2, padding=2)  # 28 -> 14
         self.conv4_2 = nn.Conv2d(256, 256, 3, stride=1, padding=1)
-        self.conv4_3 = nn.Conv2d(256, 256, 3, stride=1, padding=1)
+        self.conv4_3 = nn.Conv2d(256, 256, 3, stride=1, padding=1)  #14 * 14 * 256
 
         self.conv5_1 = nn.Conv2d(256, 512, 5, stride=2, padding=2)  # 14 -> 7
         self.conv5_2 = nn.Conv2d(512, 512, 3, stride=1, padding=1)
         self.conv5_3 = nn.Conv2d(512, 512, 3, stride=1, padding=1)
-        self.conv5_4 = nn.Conv2d(512, 512, 3, stride=1, padding=1)
+        self.conv5_4 = nn.Conv2d(512, 512, 3, stride=1, padding=1)  #7 * 7 * 512
 
         if "vgg16p2m" in config.PRETRAINED_WEIGHTS_PATH and pretrained:
             state_dict = torch.load(config.PRETRAINED_WEIGHTS_PATH["vgg16p2m"])
@@ -153,7 +153,7 @@ class VGG16P2M(nn.Module):
         img = F.relu(self.conv5_3(img))
         img = F.relu(self.conv5_4(img))
         img5 = img
-
+        #64+128+256+512
         return [img2, img3, img4, img5]
 
 
