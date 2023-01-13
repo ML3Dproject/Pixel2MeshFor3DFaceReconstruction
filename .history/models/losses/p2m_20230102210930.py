@@ -60,8 +60,8 @@ class P2MLoss(nn.Module):
 
         if different than 1 then adds a move loss as in the original TF code
         """
-        # print('input1',input1.shape)
-        # print('#####################')
+        print('input1',input1.shape)
+        print('#####################')
 
         lap1 = self.laplace_coord(input1, self.laplace_idx[block_idx])
         lap2 = self.laplace_coord(input2, self.laplace_idx[block_idx])
@@ -72,8 +72,8 @@ class P2MLoss(nn.Module):
     def normal_loss(self, gt_normal, indices, pred_points, adj_list):#adj_list are the neighbors,indices is idx2, it is the indices corresponding to the pred in GT
         edges = F.normalize(pred_points[:, adj_list[:, 0]] - pred_points[:, adj_list[:, 1]], dim=2)#not know adj_list has what thing? p-q
         nearest_normals = torch.stack([t[i] for t, i in zip(gt_normal, indices.long())])
-        # print('nearest_normals',nearest_normals.shape)
-        # print('#####################')
+        print('nearest_normals',nearest_normals.shape)
+        print('#####################')
         normals = F.normalize(nearest_normals[:, adj_list[:, 0]], dim=2)#现在这个点的对应GT的normal vector, the order is same as the adj_list[:, 0](the first points in edges)
         cosine = torch.abs(torch.sum(edges * normals, 2))
         return torch.mean(cosine)
@@ -100,8 +100,8 @@ class P2MLoss(nn.Module):
 
         for i in range(3):#3 is for 3 times deformation
             dist1, dist2, idx1, idx2 = self.chamfer_dist(gt_coord, pred_coord[i])
-            # print('idx2.shape',idx2.shape)
-            # print('#####################')
+            print('idx2.shape',idx2.shape)
+            print('#####################')
             chamfer_loss += self.options.weights.chamfer[i] * (torch.mean(dist1) +
                                                                self.options.weights.chamfer_opposite * torch.mean(dist2))#here have another weight and get the mean  of the dist
             normal_loss += self.normal_loss(gt_normal, idx2, pred_coord[i], self.edges[i])
