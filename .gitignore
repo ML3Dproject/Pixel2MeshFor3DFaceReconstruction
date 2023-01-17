@@ -116,6 +116,7 @@ logs/
 *.swp
 
 # data
+/datasets/
 datasets/data
 datasets/extras
 datasets/examples/*.obj
