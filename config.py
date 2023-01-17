@@ -6,7 +6,7 @@ SHAPENET_ROOT = os.path.join(DATASET_ROOT, "shapenet")
 IMAGENET_ROOT = os.path.join(DATASET_ROOT, "imagenet")
 
 # ellipsoid path
-ELLIPSOID_PATH = os.path.join(DATASET_ROOT, "ellipsoid/info_ellipsoid.dat")
+ELLIPSOID_PATH = os.path.join(DATASET_ROOT, "ellipsoid/pixel2mesh_aux_4stages.dat")
 
 # pretrained weights path
 PRETRAINED_WEIGHTS_PATH = {
