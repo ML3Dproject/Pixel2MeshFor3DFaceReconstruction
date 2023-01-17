@@ -9,6 +9,8 @@ from models.layers.gpooling import GUnpooling
 from models.layers.gprojection import GProjection
 
 
+#yu_git_test
+
 class P2MModel(nn.Module):
     #camera_f[248,248], camera_c[111.5,111,5], meshpos[0,0,-0.8]
     def __init__(self, options, ellipsoid, camera_f, camera_c, mesh_pos):
