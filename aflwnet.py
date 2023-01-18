@@ -45,6 +45,7 @@ class AFLW2000(Dataset):
         data = np.loadtxt(data_path, delimiter=",") #现在还是numpy_array
         #torch.from_numpy()
         pts, normals = data[:, :3], data[:, 3:]
+        pts, normals = pts.astype(np.float32),normals.astype(np.float32)
         pts -= np.array(self.mesh_pos)
         assert pts.shape[0] == normals.shape[0]
         length = pts.shape[0]
