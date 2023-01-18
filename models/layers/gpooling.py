@@ -13,15 +13,25 @@ class GUnpooling(nn.Module):
     def __init__(self, unpool_idx):
         super(GUnpooling, self).__init__()
         self.unpool_idx = unpool_idx #462*2， 1848*2
+        
+        #trainable new points
+        self.num_edge=np.size(self.unpool_idx,0)
+        new_pts_pos=np.full(self.num_edge,0.5)
+        self.new_pts_pos=nn.Parameter(torch.from_numpy(new_pts_pos))
         # save dim info
         self.in_num = torch.max(unpool_idx).item()
         self.out_num = self.in_num + len(unpool_idx)
 
     def forward(self, inputs):
         #unpooling_index可能存储edge的两个顶点
-        new_features = inputs[:, self.unpool_idx].clone()
-        new_vertices = 0.5 * new_features.sum(2)
-        output = torch.cat([inputs, new_vertices], 1)
+        #new_features = inputs[:, self.unpool_idx].clone()
+        pt1 = inputs[:, self.unpool_idx[:,0]].clone()
+        pt2 = inputs[:, self.unpool_idx[:,1]].clone()
+        for i in range(self.num_edge):
+            ll=self.new_pts_pos[i]
+            pt3 = ll*pt1+(1-ll)*pt2
+        #new_vertices = 0.5 * new_features.sum(2)
+        output = torch.cat([inputs, pt3], 1)
 
         return output
 

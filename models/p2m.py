@@ -36,14 +36,23 @@ class P2MModel(nn.Module):
                         ellipsoid.adj_mat[0], activation=self.gconv_activation),
             GBottleneck(6, self.features_dim + self.hidden_dim, self.hidden_dim, self.coord_dim,#6, 963+192, 192, 3
                         ellipsoid.adj_mat[1], activation=self.gconv_activation),
+            #GBottleneck(6, self.features_dim + self.hidden_dim, self.hidden_dim, self.last_hidden_dim,#6, 963+192, 192,192
+            #            ellipsoid.adj_mat[2], activation=self.gconv_activation),
+            GBottleneck(6, self.features_dim + self.hidden_dim, self.hidden_dim, self.coord_dim,#6, 963+192, 192,3
+                        ellipsoid.adj_mat[2], activation=self.gconv_activation),
+
+            #第四次
             GBottleneck(6, self.features_dim + self.hidden_dim, self.hidden_dim, self.last_hidden_dim,#6, 963+192, 192,192
-                        ellipsoid.adj_mat[2], activation=self.gconv_activation)
+                        ellipsoid.adj_mat[3], activation=self.gconv_activation)
         ])
 
         #graph unpooling, add more vertex, 2 times
         self.unpooling = nn.ModuleList([
             GUnpooling(ellipsoid.unpool_idx[0]), #462*2
             GUnpooling(ellipsoid.unpool_idx[1]) #1848*2
+
+            #第四次
+            GUnpooling(ellipsoid.unpool_idx[2]) #
         ])
 
         # if options.align_with_tensorflow:
@@ -54,7 +63,7 @@ class P2MModel(nn.Module):
                                       tensorflow_compatible=options.align_with_tensorflow)
 
         self.gconv = GConv(in_features=self.last_hidden_dim, out_features=self.coord_dim, #in:192, out:3
-                           adj_mat=ellipsoid.adj_mat[2])
+                           adj_mat=ellipsoid.adj_mat[3])
 
     def forward(self, img):
         #img shape: batch_size 224 224 3
@@ -100,13 +109,20 @@ class P2MModel(nn.Module):
         #把x替换成增加中点后的mesh，feature维度是963+192， 对于feature的第二次加点
         x = self.unpooling[1](torch.cat([x, x_hidden], 2))
         
-        #x3这次不是3维坐标，而是963+192
-        x3, _ = self.gcns[2](x)
+        #x3 三维坐标
+        x3, x_hidden = self.gcns[2](x)
+
+        x3_up = self.unpooling[2](x3)
+        x = self.projection(img_shape, img_feats, x3)
+        x = self.unpooling[2](torch.cat([x, x_hidden], 2))
+        x4, _ = self.gcns[3](x)
+
+
         if self.gconv_activation:
-            x3 = F.relu(x3)
-        # after deformation 3
+            x4 = F.relu(x4)
+        # after deformation 4
         #经过relu后再经过一个gcn变成3维
-        x3 = self.gconv(x3)
+        x4 = self.gconv(x4)
 
         if self.nn_decoder is not None:
             reconst = self.nn_decoder(img_feats)
@@ -114,7 +130,7 @@ class P2MModel(nn.Module):
             reconst = None
 
         return {
-            "pred_coord": [x1, x2, x3],
-            "pred_coord_before_deform": [init_pts, x1_up, x2_up],
+            "pred_coord": [x1, x2, x3, x4],
+            "pred_coord_before_deform": [init_pts, x1_up, x2_up, x3_up],
             "reconst": reconst
         }
