@@ -49,9 +49,9 @@ class P2MModel(nn.Module):
         #graph unpooling, add more vertex, 2 times
         self.unpooling = nn.ModuleList([
             GUnpooling(ellipsoid.unpool_idx[0]), #462*2
-            GUnpooling(ellipsoid.unpool_idx[1]) #1848*2
+            GUnpooling(ellipsoid.unpool_idx[1]),#1848*2
 
-            #第四次
+            #第三次
             GUnpooling(ellipsoid.unpool_idx[2]) #
         ])
 
