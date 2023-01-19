@@ -116,6 +116,7 @@ logs/
 *.swp
 
 # data
+/GenerateData/
 /datasets/
 datasets/data
 datasets/extras
