@@ -38,7 +38,7 @@ class Ellipsoid(object):
 
         for i in range(4):
             self.edges.append(torch.tensor(fp_info[1 + i][1][0], dtype=torch.long))
-            self.laplace_idx.append(torch.tensor(fp_info[7][i], dtype=torch.long))
+            self.laplace_idx.append(torch.tensor(fp_info[8][i], dtype=torch.long))
 
         # unpool index
         # num_pool_edges * 2
@@ -62,4 +62,5 @@ class Ellipsoid(object):
             face_file = os.path.join(ellipsoid_dir, "face%d.obj" % i)
             faces = np.loadtxt(face_file, dtype='|S32')
             self.obj_fmt_faces.append(faces)
-            self.faces.append(torch.tensor(faces[:, 1:].astype(np.int) - 1))
+            self.faces.append(torch.tensor(faces[:, 1:].astype(np.float64).astype(np.int64) - 1))
+            # self.faces = np.append(self.faces, torch.tensor(faces[:, 1:].astype(np.float).astype(np.int) - 1))

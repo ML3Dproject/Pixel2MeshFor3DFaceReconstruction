@@ -19,13 +19,15 @@ dataset:
   shapenet:
     num_points: 9000
     resize_with_constant_border: true
-  subset_eval: test_tf
-  subset_train: train_tf
+  subset_eval: test_tf-Copy1
+  subset_train: testoverfit_tf
+
 log_dir: logs
 log_level: info
 loss:
   weights:
     chamfer:
+    - 1.0
     - 1.0
     - 1.0
     - 1.0
@@ -69,7 +71,7 @@ test:
 train:
   batch_size: 1
   checkpoint_steps: 10000
-  num_epochs: 2
+  num_epochs: 90
   shuffle: true
   summary_steps: 1
   test_epochs: 1
