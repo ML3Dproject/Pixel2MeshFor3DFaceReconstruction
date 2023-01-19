@@ -24,14 +24,15 @@ class GUnpooling(nn.Module):
 
     def forward(self, inputs):
         #unpooling_index可能存储edge的两个顶点
-        #new_features = inputs[:, self.unpool_idx].clone()
-        pt1 = inputs[:, self.unpool_idx[:,0]].clone()
-        pt2 = inputs[:, self.unpool_idx[:,1]].clone()
+        new_features = inputs[:, self.unpool_idx].clone()
+        new_vertices = 0.5 * new_features.sum(2)#1*edges*3
+        torch.clamp(self.new_pts_pos, 0.0, 1.0, out=None)
         for i in range(self.num_edge):
             ll=self.new_pts_pos[i]
-            pt3 = ll*pt1+(1-ll)*pt2
-        #new_vertices = 0.5 * new_features.sum(2)
-        output = torch.cat([inputs, pt3], 1)
+            new_vertices[:,i] = ll * new_features[:,i,0] + (1-ll)*new_features[:,i,1]
+            #new_vertices[:,i] = ll*new_features[:,i]+(1-ll)*new_features[:,i]
+        
+        output = torch.cat([inputs, new_vertices], 1)
 
         return output
 
