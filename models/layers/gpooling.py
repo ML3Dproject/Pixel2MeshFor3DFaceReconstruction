@@ -60,7 +60,7 @@ class GUnpooling(nn.Module):
         
         #trainable new points
         self.num_edge=np.size(self.unpool_idx,0)
-        new_pts_pos=np.full(self.num_edge,0.3,dtype=np.float32)
+        new_pts_pos=np.full(self.num_edge,0.5,dtype=np.float32)
         self.new_pts_pos=nn.Parameter(torch.from_numpy(new_pts_pos))
         # save dim info
         self.in_num = torch.max(unpool_idx).item()
