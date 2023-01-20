@@ -60,7 +60,7 @@ class GUnpooling(nn.Module):
         
         #trainable new points
         self.num_edge=np.size(self.unpool_idx,0)
-        new_pts_pos=np.full(self.num_edge,0.5,dtype=np.float32)
+        new_pts_pos=np.full(self.num_edge,0.3,dtype=np.float32)
         self.new_pts_pos=nn.Parameter(torch.from_numpy(new_pts_pos))
         # save dim info
         self.in_num = torch.max(unpool_idx).item()
@@ -69,12 +69,24 @@ class GUnpooling(nn.Module):
     def forward(self, inputs):
         #unpooling_index可能存储edge的两个顶点
         new_features = inputs[:, self.unpool_idx].clone()
-        new_vertices = 0.5 * new_features.sum(2)#1*edges*3
-        torch.clamp(self.new_pts_pos, 0.0, 1.0, out=None)
-        for i in range(self.num_edge):
-            ll=self.new_pts_pos[i]
-            new_vertices[:,i] = ll * new_features[:,i,0] + (1-ll)*new_features[:,i,1]
-            #new_vertices[:,i] = ll*new_features[:,i]+(1-ll)*new_features[:,i]
+        # new_vertices = 0.5 * new_features.sum(2)#1*edges*3
+        # print(self.new_pts_pos.reshape(-1, 1))
+        # print("222",1 - self.new_pts_pos.reshape(-1, 1))
+        
+        
+        unpooling_wights = torch.cat([self.new_pts_pos.reshape(-1, 1), 1 - self.new_pts_pos.reshape(-1, 1)], dim=1)
+        unpooling_wights_expand = unpooling_wights.view(new_features.shape[1], 2, 1)#462*2 -> 462*2*1
+        unpooling_wights = unpooling_wights_expand.expand_as(new_features)#沿着第3维复制,新增第一维 462*2*1 ->batchsize*462*2*3
+        features = torch.mul(new_features,unpooling_wights)#对应相乘
+        new_vertices = torch.sum(features,dim=2)
+        
+        
+        
+        # torch.clamp(self.new_pts_pos, 0.0, 1.0, out=None)
+        # for i in range(self.num_edge):
+        #     ll=self.new_pts_pos[i]
+        #     new_vertices[:,i] = ll * new_features[:,i,0] + (1-ll)*new_features[:,i,1]
+        #     #new_vertices[:,i] = ll*new_features[:,i]+(1-ll)*new_features[:,i]
         
         output = torch.cat([inputs, new_vertices], 1)
 
