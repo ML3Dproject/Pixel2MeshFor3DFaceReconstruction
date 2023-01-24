@@ -26,8 +26,8 @@ options.checkpoint = None
 
 options.dataset = edict()
 options.dataset.name = "shapenet"
-options.dataset.subset_train = "train_small"
-options.dataset.subset_eval = "test_small"
+options.dataset.subset_train = "testoverfit_tf"
+options.dataset.subset_eval = "test_tf-Copy1"
 options.dataset.camera_f = [248., 248.]
 options.dataset.camera_c = [111.5, 111.5]
 options.dataset.mesh_pos = [0., 0., -0.8]
@@ -68,7 +68,7 @@ options.loss.weights.chamfer_opposite = 1.
 options.loss.weights.reconst = 0.
 
 options.train = edict()
-options.train.num_epochs = 50
+options.train.num_epochs = 110
 options.train.batch_size = 4
 options.train.summary_steps = 50
 options.train.checkpoint_steps = 10000

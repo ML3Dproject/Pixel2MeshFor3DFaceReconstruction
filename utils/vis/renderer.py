@@ -126,7 +126,7 @@ class MeshRenderer(object):
         for i in range(batch_size):
             image = batch_input["images_orig"][i].cpu().numpy()
             gt_points = batch_input["points"][i].cpu().numpy() + mesh_pos
-            for j in range(3):
+            for j in range(4):
                 for k in (["pred_coord_before_deform", "pred_coord"] if j == 0 else ["pred_coord"]):
                     coord = batch_output[k][j][i].cpu().numpy() + mesh_pos
                     images_stack.append(self.visualize_reconstruction(gt_points, coord, faces[j].cpu().numpy(), image))

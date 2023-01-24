@@ -82,6 +82,10 @@ You can modify configuration in a `yml` file for training/evaluation. It overrid
 ```
 python entrypoint_train.py --name xxx --options path/to/yaml
 ```
+#### Training example
+```
+python entrypoint_train.py --name tmp --options experiments/default/tensorflow.yml
+```
 
 *P.S. To train on slurm clusters, we also provide settings reference. Refer to [slurm](slurm) folder for details.*
 
