@@ -104,11 +104,13 @@ class VGG16P2M(nn.Module):
         self.conv5_3 = nn.Conv2d(512, 512, 3, stride=1, padding=1)
         self.conv5_4 = nn.Conv2d(512, 512, 3, stride=1, padding=1)  #7 * 7 * 512
 
-        if "vgg16p2m" in config.PRETRAINED_WEIGHTS_PATH and pretrained:
+        if  not ("vgg16p2m" in config.PRETRAINED_WEIGHTS_PATH and pretrained):
+            print("1111111")
             state_dict = torch.load(config.PRETRAINED_WEIGHTS_PATH["vgg16p2m"])
             self.load_state_dict(state_dict)
         else:
             self._initialize_weights()
+            print("22222222")
 
     def _initialize_weights(self):
         for m in self.modules():

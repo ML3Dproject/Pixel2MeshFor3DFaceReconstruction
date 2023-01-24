@@ -26,9 +26,10 @@ log_level: info
 loss:
   weights:
     chamfer:
+    - 0.2
     - 1.0
     - 1.0
-    - 1.0
+    - 1.5
     chamfer_opposite: 0.55
     constant: 1.0
     edge: 0.1
@@ -46,7 +47,7 @@ model:
   name: pixel2mesh
   z_threshold: 0
 name: p2m
-num_gpus: 8
+num_gpus: 1
 num_workers: 16
 optim:
   adam_beta1: 0.9

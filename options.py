@@ -22,7 +22,14 @@ options.log_dir = "logs"
 options.log_level = "info"
 options.summary_dir = "summary"
 options.checkpoint_dir = "checkpoints"
-options.checkpoint = None
+options.checkpoint = "checkpoints/resnet.pth.tar"
+# "checkpoints/resnet.pth.tar"
+options.load_author_checkpoint = True #目前默认导入作者的pretrain并修改（在给出上面checkpoint地址的情况下）
+options.checkpoint_2d = True #False是不要作者checkpoint的2d网络
+options.checkpoint_3d = True #False是不要作者checkpoint的3d网络
+options.old_prefix = ['gcns.2.conv2.weight','gcns.2.conv2.loop_weight','gcns.2.conv2.bias']
+options.new_prefix = ['gcns.3.conv2.weight','gcns.3.conv2.loop_weight','gcns.3.conv2.bias']
+
 
 options.dataset = edict()
 options.dataset.name = "shapenet"
@@ -35,7 +42,7 @@ options.dataset.normalization = True
 options.dataset.num_classes = 13
 
 options.dataset.shapenet = edict()
-options.dataset.shapenet.num_points = 3000
+options.dataset.shapenet.num_points = 9000
 options.dataset.shapenet.resize_with_constant_border = False
 
 options.dataset.predict = edict()
@@ -46,7 +53,7 @@ options.model.name = "pixel2mesh"
 options.model.hidden_dim = 192
 options.model.last_hidden_dim = 192
 options.model.coord_dim = 3
-options.model.backbone = "vgg16"
+options.model.backbone = "resnet50"
 options.model.gconv_activation = True
 # provide a boundary for z, so that z will never be equal to 0, on denominator
 # if z is greater than 0, it will never be less than z;
@@ -59,18 +66,18 @@ options.model.align_with_tensorflow = False
 options.loss = edict()
 options.loss.weights = edict()
 options.loss.weights.normal = 1.6e-4
-options.loss.weights.edge = 0.3
-options.loss.weights.laplace = 0.5
+options.loss.weights.edge = 0.1
+options.loss.weights.laplace = 0.3
 options.loss.weights.move = 0.1
 options.loss.weights.constant = 1.
-options.loss.weights.chamfer = [1., 1., 1.,1.]
+options.loss.weights.chamfer = [0.5, 1., 1.,1.]
 options.loss.weights.chamfer_opposite = 1.
 options.loss.weights.reconst = 0.
 
 options.train = edict()
-options.train.num_epochs = 110
-options.train.batch_size = 4
-options.train.summary_steps = 50
+options.train.num_epochs = 90
+options.train.batch_size = 1
+options.train.summary_steps = 1
 options.train.checkpoint_steps = 10000
 options.train.test_epochs = 1
 options.train.use_augmentation = True
@@ -79,7 +86,7 @@ options.train.shuffle = True
 options.test = edict()
 options.test.dataset = []
 options.test.summary_steps = 50
-options.test.batch_size = 4
+options.test.batch_size = 1
 options.test.shuffle = False
 options.test.weighted_mean = False
 
@@ -91,6 +98,7 @@ options.optim.lr = 5.0E-5
 options.optim.wd = 1.0E-6
 options.optim.lr_step = [30, 45]
 options.optim.lr_factor = 0.1
+
 
 
 def _update_dict(full_key, val, d):

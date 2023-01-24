@@ -12,6 +12,8 @@ import config
 from datasets.imagenet import ImageNet
 from datasets.shapenet import ShapeNet, get_shapenet_collate, ShapeNetImageFolder
 from functions.saver import CheckpointSaver
+from utils.processmodel import modify_state_dict
+from options import update_options, options, reset_options
 
 
 class CheckpointRunner(object):
@@ -82,7 +84,7 @@ class CheckpointRunner(object):
 
     # Pack models and optimizers in a dict - necessary for checkpointing
     def models_dict(self):
-        return None
+        return {'model': self.model}
 
     def optimizers_dict(self):
         # NOTE: optimizers and models cannot have conflicting names
@@ -93,12 +95,20 @@ class CheckpointRunner(object):
         if checkpoint is None:
             self.logger.info("Checkpoint not loaded")
             return
-        for model_name, model in self.models_dict().items():
+        for model_name, model in self.models_dict().items():#return the key and value
             if model_name in checkpoint:
                 if isinstance(model, torch.nn.DataParallel):
-                    model.module.load_state_dict(checkpoint[model_name], strict=False)
+                    if options.load_author_checkpoint:
+                        state_dict = modify_state_dict(checkpoint[model_name], old_prefix=options.old_prefix, new_prefix=options.new_prefix)
+                        model.module.load_state_dict(state_dict, strict=False)
+                    else:
+                        model.module.load_state_dict(checkpoint[model_name], strict=False)
                 else:
-                    model.load_state_dict(checkpoint[model_name], strict=False)
+                    if options.load_author_checkpoint:
+                        state_dict = modify_state_dict(checkpoint[model_name], old_prefix=options.old_prefix, new_prefix=options.new_prefix)
+                        model.load_state_dict(state_dict,strict=False)
+                    else:
+                        model.load_state_dict(checkpoint[model_name], strict=False)
         if self.optimizers_dict() is not None:
             for optimizer_name, optimizer in self.optimizers_dict().items():
                 if optimizer_name in checkpoint:

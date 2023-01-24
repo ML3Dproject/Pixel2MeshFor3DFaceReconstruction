@@ -10,7 +10,7 @@ dataset:
   mesh_pos:
   - 0.0
   - 0.0
-  - 0.0
+  - -0.8
   name: shapenet
   normalization: false
   num_classes: 13
@@ -40,7 +40,7 @@ loss:
     reconst: 0.0
 model:
   align_with_tensorflow: true
-  backbone: vgg16
+  backbone: resnet50
   coord_dim: 3
   gconv_activation: true
   hidden_dim: 256

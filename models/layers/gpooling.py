@@ -73,7 +73,7 @@ class GUnpooling(nn.Module):
         # print(self.new_pts_pos.reshape(-1, 1))
         # print("222",1 - self.new_pts_pos.reshape(-1, 1))
         
-        
+        torch.clamp(self.new_pts_pos, 0.0, 1.0, out=None)
         unpooling_wights = torch.cat([self.new_pts_pos.reshape(-1, 1), 1 - self.new_pts_pos.reshape(-1, 1)], dim=1)
         unpooling_wights_expand = unpooling_wights.view(new_features.shape[1], 2, 1)#462*2 -> 462*2*1
         unpooling_wights = unpooling_wights_expand.expand_as(new_features)#沿着第3维复制,新增第一维 462*2*1 ->batchsize*462*2*3

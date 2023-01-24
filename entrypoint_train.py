@@ -1,5 +1,6 @@
 import argparse
 import sys
+import torch
 
 from functions.trainer import Trainer
 from options import update_options, options, reset_options
@@ -28,6 +29,7 @@ def parse_args():
 
 
 def main():
+    # torch.backends.cudnn.enabled=False
     args = parse_args()
     logger, writer = reset_options(options, args)
 

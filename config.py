@@ -13,6 +13,7 @@ PRETRAINED_WEIGHTS_PATH = {
     "vgg16": os.path.join(DATASET_ROOT, "pretrained/vgg16-397923af.pth"),
     "resnet50": os.path.join(DATASET_ROOT, "pretrained/resnet50-19c8e357.pth"),
     "vgg16p2m": os.path.join(DATASET_ROOT, "pretrained/vgg16-p2m.pth"),
+    "vggface": os.path.join(DATASET_ROOT, "pretrained/resnet50_ft_weight.pkl"),
 }
 
 # Mean and standard deviation for normalizing input image
