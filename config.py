@@ -4,9 +4,12 @@ import os
 DATASET_ROOT = "datasets/data"
 SHAPENET_ROOT = os.path.join(DATASET_ROOT, "shapenet")
 IMAGENET_ROOT = os.path.join(DATASET_ROOT, "imagenet")
+AFLW2000_ROOT = os.path.join(DATASET_ROOT, "AFLW2000-3D")
 
 # ellipsoid path
 ELLIPSOID_PATH = os.path.join(DATASET_ROOT, "ellipsoid/pixel2mesh_aux_4stages.dat")
+# ELLIPSOID_PATH = os.path.join(DATASET_ROOT, "ellipsoid/semi-sphere.dat")
+
 
 # pretrained weights path
 PRETRAINED_WEIGHTS_PATH = {

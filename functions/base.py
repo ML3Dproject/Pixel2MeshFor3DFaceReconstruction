@@ -11,6 +11,8 @@ from torch.utils.data.dataloader import default_collate
 import config
 from datasets.imagenet import ImageNet
 from datasets.shapenet import ShapeNet, get_shapenet_collate, ShapeNetImageFolder
+#新增aflw_dataset
+from aflwnet import AFLW2000, get_aflw_collate
 from functions.saver import CheckpointSaver
 from utils.processmodel import modify_state_dict
 from options import update_options, options, reset_options
@@ -67,15 +69,21 @@ class CheckpointRunner(object):
         if dataset.name == "shapenet":
             return ShapeNet(config.SHAPENET_ROOT, dataset.subset_train if training else dataset.subset_eval,
                             dataset.mesh_pos, dataset.normalization, dataset.shapenet)
-        elif dataset.name == "shapenet_demo":
-            return ShapeNetImageFolder(dataset.predict.folder, dataset.normalization, dataset.shapenet)
-        elif dataset.name == "imagenet":
-            return ImageNet(config.IMAGENET_ROOT, "train" if training else "val")
+        # elif dataset.name == "shapenet_demo":
+        #     return ShapeNetImageFolder(dataset.predict.folder, dataset.normalization, dataset.shapenet)
+        # elif dataset.name == "imagenet":
+        #     return ImageNet(config.IMAGENET_ROOT, "train" if training else "val")
+        elif dataset.name == 'aflw2000':
+            return AFLW2000(config.AFLW2000_ROOT, dataset.subset_train if training else dataset.subset_eval,
+                            dataset.mesh_pos, dataset.normalization, dataset.shapenet)
         raise NotImplementedError("Unsupported dataset")
 
     def load_collate_fn(self, dataset, training):
         if dataset.name == "shapenet":
             return get_shapenet_collate(dataset.shapenet.num_points)
+        elif dataset.name == "aflw2000":
+            return get_aflw_collate(dataset.shapenet.num_points)
+
         else:
             return default_collate
 

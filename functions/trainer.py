@@ -25,8 +25,8 @@ class Trainer(CheckpointRunner):
             # Visualization renderer
             self.renderer = MeshRenderer(self.options.dataset.camera_f, self.options.dataset.camera_c,
                                          self.options.dataset.mesh_pos)
-            # create ellipsoid
-            self.ellipsoid = Ellipsoid(self.options.dataset.mesh_pos)
+
+            self.ellipsoid = Ellipsoid(self.options.dataset.mesh_pos) #改椭圆和半球时候要记得手动在mesh.py里改semi, config里改path
         else:
             self.renderer = None
 
