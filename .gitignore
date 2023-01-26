@@ -116,6 +116,7 @@ logs/
 *.swp
 
 # data
+/AFLW2000-3D/
 /GenerateData/
 /datasets/
 datasets/data
