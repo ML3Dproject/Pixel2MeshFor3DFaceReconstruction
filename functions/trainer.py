@@ -25,8 +25,8 @@ class Trainer(CheckpointRunner):
             # Visualization renderer
             self.renderer = MeshRenderer(self.options.dataset.camera_f, self.options.dataset.camera_c,
                                          self.options.dataset.mesh_pos)
-            # create ellipsoid
-            self.ellipsoid = Ellipsoid(self.options.dataset.mesh_pos)
+
+            self.ellipsoid = Ellipsoid(self.options.dataset.mesh_pos) #改椭圆和半球时候要记得手动在mesh.py里改semi, config里改path
         else:
             self.renderer = None
 
@@ -91,9 +91,11 @@ class Trainer(CheckpointRunner):
 
         # Grab data from the batch
         images = input_batch["images"]
-
+        lc = input_batch["left_corner"]
+        width = input_batch["image_width"]
+        height = input_batch["image_height"]
         # predict with model
-        out = self.model(images)
+        out = self.model(images, lc, width, height)
 
         # compute loss
         loss, loss_summary = self.criterion(out, input_batch)

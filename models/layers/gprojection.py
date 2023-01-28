@@ -20,7 +20,7 @@ class GProjection(nn.Module):
         self.bound = 0
         self.tensorflow_compatible = tensorflow_compatible
         if self.bound != 0:
-            self.threshold = Threshold(bound, bound)
+            self.threshold = Threshold(bound, bound)#>bound is its own values
 
     def bound_val(self, x):
         """
@@ -66,14 +66,18 @@ class GProjection(nn.Module):
         output = Q11 + Q21 + Q12 + Q22
         return output
 
-    def forward(self, resolution, img_features, inputs):
+    def forward(self, resolution, img_features, inputs,lc, width, height):
         half_resolution = (resolution - 1) / 2
-        camera_c_offset = np.array(self.camera_c) - half_resolution
         # map to [-1, 1]
         # not sure why they render to negative x
-        positions = inputs + torch.tensor(self.mesh_pos, device=inputs.device, dtype=torch.float)
-        w = -self.camera_f[0] * (positions[:, :, 0] / self.bound_val(positions[:, :, 2])) + camera_c_offset[0]
-        h = self.camera_f[1] * (positions[:, :, 1] / self.bound_val(positions[:, :, 2])) + camera_c_offset[1]
+        # positions = inputs + torch.tensor(self.mesh_pos, device=inputs.device, dtype=torch.float)
+        # w = -self.camera_f[0] * (positions[:, :, 0] / self.bound_val(positions[:, :, 2])) + camera_c_offset[0]
+        # h = self.camera_f[1] * (positions[:, :, 1] / self.bound_val(positions[:, :, 2])) + camera_c_offset[1]
+        positions = 1000 * (inputs + torch.tensor(self.mesh_pos, device=inputs.device, dtype=torch.float) - torch.tensor(lc, device=inputs.device, dtype=torch.float))
+        width = torch.tensor(width, device=inputs.device, dtype=torch.float)
+        height = torch.tensor(height, device=inputs.device, dtype=torch.float)
+        w = positions[:, :, 0] / (width) * resolution
+        h = positions[:, :, 1]/ (height) * resolution
 
         if self.tensorflow_compatible:
             # to align with tensorflow
@@ -83,8 +87,8 @@ class GProjection(nn.Module):
 
         else:
             # directly do clamping
-            w /= half_resolution[0]
-            h /= half_resolution[1]
+            w /= resolution[0]
+            h /= resolution[1]
 
             # clamp to [-1, 1]
             w = torch.clamp(w, min=-1, max=1)

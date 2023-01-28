@@ -24,25 +24,27 @@ options.summary_dir = "summary"
 options.checkpoint_dir = "checkpoints"
 options.checkpoint = "checkpoints/resnet.pth.tar"
 # "checkpoints/resnet.pth.tar"
+# "checkpoints/resnet.pth.tar"
+options.initial_semi = True
 options.load_author_checkpoint = True #目前默认导入作者的pretrain并修改（在给出上面checkpoint地址的情况下）
-options.checkpoint_2d = True #False是不要作者checkpoint的2d网络
+options.checkpoint_2d = False #False是不要作者checkpoint的2d网络
 options.checkpoint_3d = True #False是不要作者checkpoint的3d网络
 options.old_prefix = ['gcns.2.conv2.weight','gcns.2.conv2.loop_weight','gcns.2.conv2.bias']
 options.new_prefix = ['gcns.3.conv2.weight','gcns.3.conv2.loop_weight','gcns.3.conv2.bias']
 
 
 options.dataset = edict()
-options.dataset.name = "shapenet"
-options.dataset.subset_train = "testoverfit_tf"
-options.dataset.subset_eval = "test_tf-Copy1"
-options.dataset.camera_f = [248., 248.]
+options.dataset.name = "aflw2000" #决定用哪个dataset, 暂时默认不用shapenet了
+options.dataset.subset_train = "train_tf_overf" #"train_aflw"
+options.dataset.subset_eval = "test_aflw"
+options.dataset.camera_f = [24., 24.]
 options.dataset.camera_c = [111.5, 111.5]
-options.dataset.mesh_pos = [0., 0., -0.8]
+options.dataset.mesh_pos = [0., 0., 0.]
 options.dataset.normalization = True
 options.dataset.num_classes = 13
 
 options.dataset.shapenet = edict()
-options.dataset.shapenet.num_points = 9000
+options.dataset.shapenet.num_points = 20000
 options.dataset.shapenet.resize_with_constant_border = False
 
 options.dataset.predict = edict()
@@ -50,6 +52,7 @@ options.dataset.predict.folder = "/tmp"
 
 options.model = edict()
 options.model.name = "pixel2mesh"
+# options.model.eli_semi = "semi" #or "eli" 决定用半球还是椭圆
 options.model.hidden_dim = 192
 options.model.last_hidden_dim = 192
 options.model.coord_dim = 3
@@ -75,7 +78,7 @@ options.loss.weights.chamfer_opposite = 1.
 options.loss.weights.reconst = 0.
 
 options.train = edict()
-options.train.num_epochs = 90
+options.train.num_epochs = 5000
 options.train.batch_size = 1
 options.train.summary_steps = 1
 options.train.checkpoint_steps = 10000

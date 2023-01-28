@@ -13,7 +13,9 @@ def get_bigmodule_list(children):#useless
 def modify_state_dict(pretrained_dict, old_prefix, new_prefix):
     state_dict = {}
     for k, v in pretrained_dict.items():
-        if  k.startswith("nn_encoder") and (not options.checkpoint_2d):
+        if  k.startswith('init_pts') and options.initial_semi:
+            print("Missing key(s) in state_dict :{}".format(k))
+        elif  k.startswith("nn_encoder") and (not options.checkpoint_2d):
             print("Missing key(s) in state_dict :{}".format(k))
         elif options.checkpoint_2d and (not options.checkpoint_3d):
             if k.startswith("nn_encoder"):

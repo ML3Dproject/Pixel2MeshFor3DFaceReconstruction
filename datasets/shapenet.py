@@ -82,94 +82,94 @@ class ShapeNet(BaseDataset):
     
     ### yu_git_test
 
-#aaa
-class AFLW2000(BaseDataset):
-    """
-    Dataset wrapping images and target meshes for AFLW2000.
-    """
+# #aaa
+# class AFLW2000(BaseDataset):
+#     """
+#     Dataset wrapping images and target meshes for AFLW2000.
+#     """
 
-    def __init__(self, file_root, file_list_name, mesh_pos, normalization, shapenet_options):
-        super().__init__()
-        self.file_root = file_root
+#     def __init__(self, file_root, file_list_name, mesh_pos, normalization, shapenet_options):
+#         super().__init__()
+#         self.file_root = file_root
 
-        #INPUT ARGUMENTS
-        #file_root: 
-        #  original:..datasets/data/shapenet
-        #  now:..datasets/data/AFLW2000-3D
+#         #INPUT ARGUMENTS
+#         #file_root: 
+#         #  original:..datasets/data/shapenet
+#         #  now:..datasets/data/AFLW2000-3D
 
-        #file_list_name:
-        #  original:e.g. train_all.txt
-        #  now: train_aflw.txt/ test_aflw.txt
+#         #file_list_name:
+#         #  original:e.g. train_all.txt
+#         #  now: train_aflw.txt/ test_aflw.txt
 
-        #mesh_pos:
-        #  original:[0., 0., -0.8]
-        #  now:???do we need mesh_pos? how can we determine the mesh_pos?????????????
+#         #mesh_pos:
+#         #  original:[0., 0., -0.8]
+#         #  now:???do we need mesh_pos? how can we determine the mesh_pos?????????????
 
-        #normalization:...
+#         #normalization:...
 
-        #shapenet_options:...
-
-
-        #SELF VARIABLES
-        #self.labels_map: {'02691156': 0, '02828884': 1, '02933112': 2, '02958343': 3, '03001627': 4, '03211117': 5, '03636649': 6, '03691459': 7, '04090263': 8, '04256520': 9, '04379243': 10, '04401088': 11, '04530566': 12}
-        self.labels_map = {'face':0}
-
-        #self.file_names: ['02691156_fff513f407e00e85a9ced22d91ad7027_19.dat', '02691156_fff513f407e00e85a9ced22d91ad7027_20.dat', '02691156_fff513f407e00e85a9ced22d91ad7027_23.dat']
-        #self.file_names: ['image02795.jpg']
-        with open(os.path.join(self.file_root, "meta", file_list_name + ".txt"), "r") as fp:
-            self.file_names = fp.read().split("\n")
-
-        self.normalization = normalization #boolean 
-        self.mesh_pos = mesh_pos #mesh position
+#         #shapenet_options:...
 
 
-    def __getitem__(self, index):
+#         #SELF VARIABLES
+#         #self.labels_map: {'02691156': 0, '02828884': 1, '02933112': 2, '02958343': 3, '03001627': 4, '03211117': 5, '03636649': 6, '03691459': 7, '04090263': 8, '04256520': 9, '04379243': 10, '04401088': 11, '04530566': 12}
+#         self.labels_map = {'face':0}
 
-        label = "face"
-        filename = self.file_names[index] #file name of the img. e.g.image00002.jpg
+#         #self.file_names: ['02691156_fff513f407e00e85a9ced22d91ad7027_19.dat', '02691156_fff513f407e00e85a9ced22d91ad7027_20.dat', '02691156_fff513f407e00e85a9ced22d91ad7027_23.dat']
+#         #self.file_names: ['image02795.jpg']
+#         with open(os.path.join(self.file_root, "meta", file_list_name + ".txt"), "r") as fp:
+#             self.file_names = fp.read().split("\n")
 
-        img_path =  self.file_root + "/AFLW2000/"+ filename
-        data_path = self.file_root + "/AFLW2000/"+ filename[:-4] + ".txt"
-
-        #np.loadtxt need file without "," !!!!!!!!
-        data = np.loadtxt(data_path)
-        #first 3 columns is point positions?
-        pts, normals = data[:, :3], data[:, 3:]
-
-        img = io.imread(img_path)
-
-        if self.resize_with_constant_border:
-            img = transform.resize(img, (config.IMG_SIZE, config.IMG_SIZE),
-                                    mode='constant', anti_aliasing=False)  # to match behavior of old versions
-        else:
-            img = transform.resize(img, (config.IMG_SIZE, config.IMG_SIZE))
-
-        img = img.astype(np.float32)
-
-        pts -= np.array(self.mesh_pos)
-        assert pts.shape[0] == normals.shape[0]
-        length = pts.shape[0]
-
-        img = torch.from_numpy(np.transpose(img, (2, 0, 1))) #turn data into [channels, height, width]
-        img_normalized = self.normalize_img(img) if self.normalization else img  #normalize_img哪来的????????????????
+#         self.normalization = normalization #boolean 
+#         self.mesh_pos = mesh_pos #mesh position
 
 
-        #OUTPUT QUESTIONS:
-        #labels: 0????????????
-        #filename:????????????
+#     def __getitem__(self, index):
 
-        return {
-            "images": img_normalized,
-            "images_orig": img,
-            "points": pts,
-            "normals": normals,
-            "labels": 0, #means face
-            "filename": filename,#dont know if its used later?????
-            "length": length
-        }
+#         label = "face"
+#         filename = self.file_names[index] #file name of the img. e.g.image00002.jpg
 
-    def __len__(self):
-        return len(self.file_names)
+#         img_path =  self.file_root + "/AFLW2000/"+ filename
+#         data_path = self.file_root + "/AFLW2000/"+ filename[:-4] + ".txt"
+
+#         #np.loadtxt need file without "," !!!!!!!!
+#         data = np.loadtxt(data_path)
+#         #first 3 columns is point positions?
+#         pts, normals = data[:, :3], data[:, 3:]
+
+#         img = io.imread(img_path)
+
+#         if self.resize_with_constant_border:
+#             img = transform.resize(img, (config.IMG_SIZE, config.IMG_SIZE),
+#                                     mode='constant', anti_aliasing=False)  # to match behavior of old versions
+#         else:
+#             img = transform.resize(img, (config.IMG_SIZE, config.IMG_SIZE))
+
+#         img = img.astype(np.float32)
+
+#         pts -= np.array(self.mesh_pos)
+#         assert pts.shape[0] == normals.shape[0]
+#         length = pts.shape[0]
+
+#         img = torch.from_numpy(np.transpose(img, (2, 0, 1))) #turn data into [channels, height, width]
+#         img_normalized = self.normalize_img(img) if self.normalization else img  #normalize_img哪来的????????????????
+
+
+#         #OUTPUT QUESTIONS:
+#         #labels: 0????????????
+#         #filename:????????????
+
+#         return {
+#             "images": img_normalized,
+#             "images_orig": img,
+#             "points": pts,
+#             "normals": normals,
+#             "labels": 0, #means face
+#             "filename": filename,#dont know if its used later?????
+#             "length": length
+#         }
+
+#     def __len__(self):
+#         return len(self.file_names)
 
 class ShapeNetImageFolder(BaseDataset):
 

@@ -116,9 +116,10 @@ logs/
 *.swp
 
 # data
+/checkpoints/
 /AFLW2000-3D/
 /GenerateData/
-
+/datasets/
 datasets/data
 datasets/extras
 datasets/data/AFLW2000-3D/AFLW2000

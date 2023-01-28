@@ -53,7 +53,11 @@ class Predictor(CheckpointRunner):
         # Run inference
         with torch.no_grad():
             images = input_batch['images']
-            out = self.model(images)
+            lc = input_batch["left_corner"]
+            width = input_batch["image_width"]
+            height = input_batch["image_height"]
+            # predict with model
+            out = self.model(images, lc, width, height)
             self.save_inference_results(input_batch, out)
 
     def predict(self):

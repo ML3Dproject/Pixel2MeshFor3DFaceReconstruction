@@ -100,8 +100,12 @@ class Evaluator(CheckpointRunner):
         with torch.no_grad():
             # Get ground truth
             images = input_batch['images']
+            lc = input_batch["left_corner"]
+            width = input_batch["image_width"]
+            height = input_batch["image_height"]
+            # predict with model
+            out = self.model(images, lc, width, height)
 
-            out = self.model(images)
 
             if self.options.model.name == "pixel2mesh":
                 pred_vertices = out["pred_coord"][-1]

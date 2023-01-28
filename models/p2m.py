@@ -65,7 +65,7 @@ class P2MModel(nn.Module):
         self.gconv = GConv(in_features=self.last_hidden_dim, out_features=self.coord_dim, #in:192, out:3
                            adj_mat=ellipsoid.adj_mat[3])
 
-    def forward(self, img):
+    def forward(self, img, lc, width, height):
         #img shape: batch_size 224 224 3
         batch_size = img.size(0)
         #包含[img2, img3, img4, img5]
@@ -78,7 +78,7 @@ class P2MModel(nn.Module):
         init_pts = self.init_pts.data.unsqueeze(0).expand(batch_size, -1, -1)
         # GCN Block 1
         
-        x = self.projection(img_shape, img_feats, init_pts)
+        x = self.projection(img_shape, img_feats, init_pts, lc, width, height)
         #x in shape [batch_size x num_points x feat_dim=963]
         #X1是新的坐标=3，x_hidden是新feature=192
         x1, x_hidden = self.gcns[0](x)
@@ -89,7 +89,7 @@ class P2MModel(nn.Module):
 
         # GCN Block 2
         
-        x = self.projection(img_shape, img_feats, x1)
+        x = self.projection(img_shape, img_feats, x1, lc, width, height)
         #x in shape [batch_size x num_points x feat_dim=963]
 
         #把x替换成增加中点后的mesh，feature维度是963+192， 对于feature的第一次加点
@@ -103,7 +103,7 @@ class P2MModel(nn.Module):
         x2_up = self.unpooling[1](x2)
 
         # GCN Block 3
-        x = self.projection(img_shape, img_feats, x2)
+        x = self.projection(img_shape, img_feats, x2, lc, width, height)
         #x in shape [batch_size x num_points x feat_dim=963]
 
         #把x替换成增加中点后的mesh，feature维度是963+192， 对于feature的第二次加点
@@ -113,7 +113,7 @@ class P2MModel(nn.Module):
         x3, x_hidden = self.gcns[2](x)
 
         x3_up = self.unpooling[2](x3)
-        x = self.projection(img_shape, img_feats, x3)
+        x = self.projection(img_shape, img_feats, x3,  lc, width, height)
         x = self.unpooling[2](torch.cat([x, x_hidden], 2))
         x4, _ = self.gcns[3](x)
 
