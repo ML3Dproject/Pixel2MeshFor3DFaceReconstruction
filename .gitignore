@@ -116,13 +116,16 @@ logs/
 *.swp
 
 # data
+/AFLW2000-3D/
 /GenerateData/
-/datasets/
+
 datasets/data
 datasets/extras
+datasets/data/AFLW2000-3D/AFLW2000
 datasets/examples/*.obj
 summary
 checkpoints
+/useful data/
 
 # IDEA
 .idea
