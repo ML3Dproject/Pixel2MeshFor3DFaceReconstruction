@@ -46,7 +46,7 @@ class AFLW2000(Dataset):
 
         data = np.loadtxt(data_path, delimiter=",") #现在还是numpy_array
         #torch.from_numpy()
-        pts, normals, weights = data[:, :3]/1000., data[:, 3:-1], data[:,-1]
+        pts, normals, weights = data[:, :3]/1000., data[:, 3:6], data[:,-1]
         pts, normals, weights = pts.astype(np.float32),normals.astype(np.float32), weights.astype(np.float32)
         # pts, normals = data[:, :3]/1000., data[:, 3:5]
         # pts, normals = pts.astype(np.float32),normals.astype(np.float32)
@@ -61,7 +61,7 @@ class AFLW2000(Dataset):
         img = io.imread(img_path)#137*137*4，α channel 不透明度
         # img[np.where(img[:, :, 3] == 0)] = 255# why ==0 to 255?? if have values, it ranges in 0-255
         # img现在是np.array
-        image_width, image_height = img.size
+        image_width, image_height, _ = img.shape
 
         #resize
         if self.resize_with_constant_border:
@@ -122,7 +122,10 @@ def get_aflw_collate(num_points):#num_points = 20000
                     for j, weight in enumerate(weights):
                         if weight == i:
                             indices.append(j)
-                    sampled_points = np.random.choice(indices, size=sample_number, replace=False)
+                    if np.array(indices).shape[0] >= sample_number:
+                        sampled_points = np.random.choice(indices, size=sample_number, replace=False)
+                    else:
+                        sampled_points = np.random.choice(indices, size=sample_number, replace=True)
                     choices = np.concatenate((choices,sampled_points),axis = 0).astype(np.int)
                 # length = pts.shape[0]
                 # choices = np.resize(np.random.permutation(length), num_points)      

@@ -35,7 +35,7 @@ options.new_prefix = ['gcns.3.conv2.weight','gcns.3.conv2.loop_weight','gcns.3.c
 
 options.dataset = edict()
 options.dataset.name = "aflw2000" #决定用哪个dataset, 暂时默认不用shapenet了
-options.dataset.subset_train = "train_tf_overf" #"train_aflw"
+options.dataset.subset_train = "train_aflw_small"#"train_aflw""train_tf_overf"
 options.dataset.subset_eval = "test_aflw"
 options.dataset.camera_f = [24., 24.]
 options.dataset.camera_c = [111.5, 111.5]

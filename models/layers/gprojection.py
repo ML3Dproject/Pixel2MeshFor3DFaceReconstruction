@@ -70,14 +70,17 @@ class GProjection(nn.Module):
         half_resolution = (resolution - 1) / 2
         # map to [-1, 1]
         # not sure why they render to negative x
+        camera_c_offset = np.array(self.camera_c) - half_resolution
         # positions = inputs + torch.tensor(self.mesh_pos, device=inputs.device, dtype=torch.float)
         # w = -self.camera_f[0] * (positions[:, :, 0] / self.bound_val(positions[:, :, 2])) + camera_c_offset[0]
         # h = self.camera_f[1] * (positions[:, :, 1] / self.bound_val(positions[:, :, 2])) + camera_c_offset[1]
-        positions = 1000 * (inputs + torch.tensor(self.mesh_pos, device=inputs.device, dtype=torch.float) - torch.tensor(lc, device=inputs.device, dtype=torch.float))
-        width = torch.tensor(width, device=inputs.device, dtype=torch.float)
-        height = torch.tensor(height, device=inputs.device, dtype=torch.float)
-        w = positions[:, :, 0] / (width) * resolution
-        h = positions[:, :, 1]/ (height) * resolution
+        positions = 1000 * (inputs + torch.tensor(self.mesh_pos, device=inputs.device, dtype=torch.float) - lc.clone().detach().cuda().float())
+        # width = torch.tensor(width, device=inputs.device, dtype=torch.float)
+        # height = torch.tensor(height, device=inputs.device, dtype=torch.float)
+        width = width.clone().detach().cuda().float()  - camera_c_offset[0]
+        height = height.clone().detach().cuda().float()  - camera_c_offset[1]
+        w = positions[:, :, 0] / (width) * resolution[0]
+        h = positions[:, :, 1] / (height) * resolution[1]
 
         if self.tensorflow_compatible:
             # to align with tensorflow
@@ -87,8 +90,8 @@ class GProjection(nn.Module):
 
         else:
             # directly do clamping
-            w /= resolution[0]
-            h /= resolution[1]
+            w /= half_resolution[0]
+            h /= half_resolution[1]
 
             # clamp to [-1, 1]
             w = torch.clamp(w, min=-1, max=1)

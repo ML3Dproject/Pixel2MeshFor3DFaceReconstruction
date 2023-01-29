@@ -12,6 +12,7 @@ from models.p2m import P2MModel
 from utils.average_meter import AverageMeter
 from utils.mesh import Ellipsoid
 from utils.vis.renderer import MeshRenderer
+import cv2
 
 
 class Evaluator(CheckpointRunner):
@@ -65,7 +66,7 @@ class Evaluator(CheckpointRunner):
         # calculate accurate chamfer distance; ground truth points with different lengths;
         # therefore cannot be batched
         batch_size = pred_vertices.size(0)
-        pred_length = pred_vertices.size(1)
+        pred_length = pred_vertices.size(1)       
         for i in range(batch_size):
             gt_length = gt_points[i].size(0)
             label = labels[i].cpu().item()
@@ -74,6 +75,32 @@ class Evaluator(CheckpointRunner):
             self.chamfer_distance[label].update(np.mean(d1) + np.mean(d2))
             self.f1_tau[label].update(self.evaluate_f1(d1, d2, pred_length, gt_length, 1E-4))
             self.f1_2tau[label].update(self.evaluate_f1(d1, d2, pred_length, gt_length, 2E-4))
+            
+    # def evaluate_nme(self,pred_vertices, gt_points, labels, img):
+    #     batch_size = pred_vertices.size(0)
+    #     for i in range(batch_size):
+    #         gt_length = gt_points[i].size(0)
+    #         label = labels[i].cpu().item()
+    #         d1, d2, i1, i2 = self.chamfer(pred_vertices[i].unsqueeze(0), gt_points[i].unsqueeze(0))
+    #         d1, d2 = d1.cpu().numpy(), d2.cpu().numpy()  # convert to millimeter
+    #         eye_cascade = cv2.CascadeClassifier("haarcascade_eye.xml")
+    #         eyes = eye_cascade.detectMultiScale(np.array(img[i].cpu()))
+
+    #         # Check if two eyes are detected
+    #         if len(eyes) == 2:
+    #         # Get the eye coordinates
+    #             (ex1, ey1, ew1, eh1) = eyes[0]
+    #             (ex2, ey2, ew2, eh2) = eyes[1]
+
+    #         # Calculate the inter-ocular distance
+    #             face_size = np.sqrt((ex2 + ew2 / 2 - ex1 - ew1 / 2) ** 2 + (ey2 + eh2 / 2 - ey1 - eh1 / 2) ** 2)
+    #             return self.nme[label].update(self.normalized_mean_error(d1, d2, face_size, gt_length))
+    #         else:
+    #             return self.nme[label]
+    # def normalized_mean_error(self, dis_to_pred, dis_to_gt, face_size, gt_length):
+    #     error = np.mean(dis_to_pred) + np.mean(dis_to_gt)
+    #     nme = torch.sum(error) / (gt_length * face_size)
+    #     return nme
 
     def evaluate_accuracy(self, output, target):
         """Computes the accuracy over the k top predictions for the specified values of k"""
@@ -113,6 +140,7 @@ class Evaluator(CheckpointRunner):
                 if isinstance(gt_points, list):
                     gt_points = [pts.cuda() for pts in gt_points]
                 self.evaluate_chamfer_and_f1(pred_vertices, gt_points, input_batch["labels"])
+                # self.evaluate_nme(pred_vertices, gt_points, input_batch["labels"],images)
             elif self.options.model.name == "classifier":
                 self.evaluate_accuracy(out, input_batch["labels"])
 
@@ -136,6 +164,7 @@ class Evaluator(CheckpointRunner):
             self.chamfer_distance = [AverageMeter() for _ in range(self.num_classes)]
             self.f1_tau = [AverageMeter() for _ in range(self.num_classes)]
             self.f1_2tau = [AverageMeter() for _ in range(self.num_classes)]
+            # self.nme = [AverageMeter() for _ in range(self.num_classes)]
         elif self.options.model.name == "classifier":
             self.acc_1 = AverageMeter()
             self.acc_5 = AverageMeter()
@@ -181,6 +210,7 @@ class Evaluator(CheckpointRunner):
                 "cd": self.average_of_average_meters(self.chamfer_distance),
                 "f1_tau": self.average_of_average_meters(self.f1_tau),
                 "f1_2tau": self.average_of_average_meters(self.f1_2tau),
+                # "nme": self.average_of_average_meters(self.nme)
             }
         elif self.options.model.name == "classifier":
             return {

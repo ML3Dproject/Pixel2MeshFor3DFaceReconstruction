@@ -80,6 +80,9 @@ class Predictor(CheckpointRunner):
     def save_inference_results(self, inputs, outputs):
         if self.options.model.name == "pixel2mesh":
             batch_size = inputs["images"].size(0)
+            lc = inputs["left_corner"]
+            width = inputs["image_width"]
+            height = inputs["image_height"]
             for i in range(batch_size):
                 basename, ext = os.path.splitext(inputs["filepath"][i])
                 mesh_center = np.mean(outputs["pred_coord_before_deform"][0][i].cpu().numpy(), 0)
@@ -115,8 +118,11 @@ class Predictor(CheckpointRunner):
                                                                                      self.options.dataset.mesh_pos),
                                                                                  self.ellipsoid.faces[k],
                                                                                  image,
-                                                                                 mesh_only=True,
-                                                                                 color=color)
+                                                                                 mesh_only=False,
+                                                                                 color=color,
+                                                                                 lc=lc, 
+                                                                                 width = width, 
+                                                                                 height =height)
                             ret = np.concatenate((ret, rend_result), axis=2)
                             verts[k] = vert
                         ret = np.transpose(ret, (1, 2, 0))
