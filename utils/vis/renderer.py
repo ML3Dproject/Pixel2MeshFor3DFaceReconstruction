@@ -83,15 +83,15 @@ class MeshRenderer(object):
         color = self.colors[color]
 
         # return pointcloud
-        vertices_2d = cv2.projectPoints(np.expand_dims(vertices, -1),
-                                        rvec, tvec, camera_k, camera_dist_coeffs)[0]
-        vertices_2d = np.reshape(vertices_2d, (-1, 2))
-        # vertices = 1000 * vertices - lc.cpu().numpy()
-        # w =  vertices[:, 0] / (width) * 224
-        # h =  vertices[:, 1]/ (height) * 224
-        # w = w.reshape(-1, 1)
-        # h = h.reshape(-1, 1)
-        # vertices_2d = np.concatenate((w,h),axis = 1)
+        # vertices_2d = cv2.projectPoints(np.expand_dims(vertices, -1),
+        #                                 rvec, tvec, camera_k, camera_dist_coeffs)[0]
+        # vertices_2d = np.reshape(vertices_2d, (-1, 2))
+        vertices = 1000 * vertices - lc.clone().cpu().numpy()
+        w =  vertices[:, 0] 
+        h =  vertices[:, 1]
+        w = w.reshape(-1, 1)
+        h = h.reshape(-1, 1)
+        vertices_2d = np.concatenate((w,h),axis = 1)
         
         alpha = np.zeros((height, width, 3), np.float)
         whiteboard = np.ones((3, height, width), np.float)
