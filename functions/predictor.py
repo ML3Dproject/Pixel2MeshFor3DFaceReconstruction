@@ -80,13 +80,14 @@ class Predictor(CheckpointRunner):
     def save_inference_results(self, inputs, outputs):
         if self.options.model.name == "pixel2mesh":
             batch_size = inputs["images"].size(0)
-            lc = inputs["left_corner"]
+            lcc = inputs["left_corner"]
             width = inputs["image_width"]
             height = inputs["image_height"]
             for i in range(batch_size):
                 basename, ext = os.path.splitext(inputs["filepath"][i])
                 mesh_center = np.mean(outputs["pred_coord_before_deform"][0][i].cpu().numpy(), 0)
-                verts = [outputs["pred_coord"][k][i].cpu().numpy() for k in range(3)]
+                verts = [outputs["pred_coord"][k][i].cpu().numpy() for k in range(4)]
+                lc = lcc[i].cpu().numpy()
                 for k, vert in enumerate(verts):
                     meshname = basename + ".%d.obj" % (k + 1)
                     vert_v = np.hstack((np.full([vert.shape[0], 1], "v"), vert))
@@ -120,9 +121,7 @@ class Predictor(CheckpointRunner):
                                                                                  image,
                                                                                  mesh_only=False,
                                                                                  color=color,
-                                                                                 lc=lc, 
-                                                                                 width = width, 
-                                                                                 height =height)
+                                                                                 lc=lc)
                             ret = np.concatenate((ret, rend_result), axis=2)
                             verts[k] = vert
                         ret = np.transpose(ret, (1, 2, 0))

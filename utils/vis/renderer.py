@@ -86,6 +86,8 @@ class MeshRenderer(object):
         # vertices_2d = cv2.projectPoints(np.expand_dims(vertices, -1),
         #                                 rvec, tvec, camera_k, camera_dist_coeffs)[0]
         # vertices_2d = np.reshape(vertices_2d, (-1, 2))
+        # print(lc.shape)
+        # print(vertices.shape)
         vertices = 1000 * vertices - lc.clone().cpu().numpy()
         w =  vertices[:, 0] 
         h =  vertices[:, 1]
@@ -104,7 +106,7 @@ class MeshRenderer(object):
         rgb = _mix_render_result_with_image(rgb, alpha[0], whiteboard)
         return rgb, alpha
 
-    def visualize_reconstruction(self, gt_coord, coord, faces, image, lc, width, height, mesh_only=False,**kwargs):
+    def visualize_reconstruction(self, gt_coord, coord, faces, image, lc, mesh_only=False,**kwargs):
         camera_k = np.array([[self.camera_f[0], 0, self.camera_c[0]],
                              [0, self.camera_f[1], self.camera_c[1]],
                              [0, 0, 1]])
@@ -139,6 +141,5 @@ class MeshRenderer(object):
             for j in range(4):
                 for k in (["pred_coord_before_deform", "pred_coord"] if j == 0 else ["pred_coord"]):
                     coord = batch_output[k][j][i].cpu().numpy() + mesh_pos
-                    images_stack.append(self.visualize_reconstruction(gt_points, coord, faces[j].cpu().numpy(), image, lc=lc, width = width, 
-                                                                                 height =height))
+                    images_stack.append(self.visualize_reconstruction(gt_points, coord, faces[j].cpu().numpy(), image, lc=lc[i]))
         return torch.from_numpy(np.concatenate(images_stack, 1))

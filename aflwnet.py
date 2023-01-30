@@ -114,7 +114,7 @@ def get_aflw_collate(num_points):#num_points = 20000
         if not all_equal:
             for t in batch:
                 pts, normal, weights = t["points"], t["normals"], t["weights"]
-                sample_numbers = [2000,2500,4500]
+                sample_numbers = [1500,2000,4500]
                 choices = []
                 for i, sample_number in enumerate(sample_numbers):
                     indices = []

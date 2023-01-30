@@ -74,11 +74,11 @@ class GProjection(nn.Module):
         # positions = inputs + torch.tensor(self.mesh_pos, device=inputs.device, dtype=torch.float)
         # w = -self.camera_f[0] * (positions[:, :, 0] / self.bound_val(positions[:, :, 2])) + camera_c_offset[0]
         # h = self.camera_f[1] * (positions[:, :, 1] / self.bound_val(positions[:, :, 2])) + camera_c_offset[1]
-        positions = 1000 * (inputs + torch.tensor(self.mesh_pos, device=inputs.device, dtype=torch.float) - lc.clone().detach().cuda().float())
+        positions = 1000 * (inputs + torch.tensor(self.mesh_pos, device=inputs.device, dtype=torch.float)) - lc.unsqueeze(1).clone().detach().cuda().float()
         # width = torch.tensor(width, device=inputs.device, dtype=torch.float)
         # height = torch.tensor(height, device=inputs.device, dtype=torch.float)
-        width = width.clone().detach().cuda().float()  - camera_c_offset[0]
-        height = height.clone().detach().cuda().float()  - camera_c_offset[1]
+        width = width.unsqueeze(1).clone().detach().cuda().float()  - camera_c_offset[0]
+        height = height.unsqueeze(1).clone().detach().cuda().float()  - camera_c_offset[1]
         w = positions[:, :, 0] / (width) * resolution[0]
         h = positions[:, :, 1] / (height) * resolution[1]
 

@@ -15,7 +15,7 @@ options = edict()
 options.name = 'p2m'
 options.version = None
 options.num_workers = 1
-options.num_gpus = 1
+options.num_gpus = 3
 options.pin_memory = True
 
 options.log_dir = "logs"
@@ -35,9 +35,9 @@ options.new_prefix = ['gcns.3.conv2.weight','gcns.3.conv2.loop_weight','gcns.3.c
 
 options.dataset = edict()
 options.dataset.name = "aflw2000" #决定用哪个dataset, 暂时默认不用shapenet了
-options.dataset.subset_train = "train_aflw_small"#"train_aflw""train_tf_overf"
-options.dataset.subset_eval = "test_aflw"
-options.dataset.camera_f = [24., 24.]
+options.dataset.subset_train = "train_aflw"#"train_aflw""train_tf_overf"
+options.dataset.subset_eval = "eval_aflw"
+options.dataset.camera_f = [25., 25.]
 options.dataset.camera_c = [111.5, 111.5]
 options.dataset.mesh_pos = [0., 0., 0.]
 options.dataset.normalization = True
@@ -56,7 +56,7 @@ options.model.name = "pixel2mesh"
 options.model.hidden_dim = 192
 options.model.last_hidden_dim = 192
 options.model.coord_dim = 3
-options.model.backbone = "resnet50"
+options.model.backbone = "vggface"
 options.model.gconv_activation = True
 # provide a boundary for z, so that z will never be equal to 0, on denominator
 # if z is greater than 0, it will never be less than z;
