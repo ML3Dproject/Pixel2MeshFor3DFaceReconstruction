@@ -77,7 +77,7 @@ class MeshRenderer(object):
         return rgb, alpha
 
     def _render_pointcloud(self, vertices: np.ndarray, width, height,
-                           camera_k, camera_dist_coeffs, rvec, tvec, lc, color=None):
+                           camera_k, camera_dist_coeffs, rvec, tvec, lc, w,h,color=None):
         if color is None:
             color = 'pink'
         color = self.colors[color]
@@ -88,11 +88,14 @@ class MeshRenderer(object):
         # vertices_2d = np.reshape(vertices_2d, (-1, 2))
         # print(lc.shape)
         # print(vertices.shape)
+        # print("w",width.type())
+        w = w.clone().cpu().numpy()
+        h = h.clone().cpu().numpy()
         vertices = 1000 * vertices - lc.clone().cpu().numpy()
-        w =  vertices[:, 0] 
-        h =  vertices[:, 1]
+        w =  vertices[:, 0] / w * width
+        h =  vertices[:, 1]  / h *height
         w = w.reshape(-1, 1)
-        h = h.reshape(-1, 1)
+        h = h.reshape(-1, 1) - 30.
         vertices_2d = np.concatenate((w,h),axis = 1)
         
         alpha = np.zeros((height, width, 3), np.float)
@@ -106,7 +109,7 @@ class MeshRenderer(object):
         rgb = _mix_render_result_with_image(rgb, alpha[0], whiteboard)
         return rgb, alpha
 
-    def visualize_reconstruction(self, gt_coord, coord, faces, image, lc, mesh_only=False,**kwargs):
+    def visualize_reconstruction(self, gt_coord, coord, faces, image, lc, w, h, mesh_only=False,**kwargs):
         camera_k = np.array([[self.camera_f[0], 0, self.camera_c[0]],
                              [0, self.camera_f[1], self.camera_c[1]],
                              [0, 0, 1]])
@@ -120,9 +123,9 @@ class MeshRenderer(object):
             return mesh
 
         gt_pc, _ = self._render_pointcloud(gt_coord, image.shape[2], image.shape[1],
-                                           camera_k, dist_coeffs, rvec, tvec, lc, **kwargs)
+                                           camera_k, dist_coeffs, rvec, tvec, lc, w, h, **kwargs)
         pred_pc, _ = self._render_pointcloud(coord, image.shape[2], image.shape[1],
-                                             camera_k, dist_coeffs, rvec, tvec, lc, **kwargs)
+                                             camera_k, dist_coeffs, rvec, tvec, lc, w, h,**kwargs)
         return np.concatenate((image, gt_pc, pred_pc, mesh), 2)
 
     def p2m_batch_visualize(self, batch_input, batch_output, faces, atmost=3):
@@ -141,5 +144,5 @@ class MeshRenderer(object):
             for j in range(4):
                 for k in (["pred_coord_before_deform", "pred_coord"] if j == 0 else ["pred_coord"]):
                     coord = batch_output[k][j][i].cpu().numpy() + mesh_pos
-                    images_stack.append(self.visualize_reconstruction(gt_points, coord, faces[j].cpu().numpy(), image, lc=lc[i]))
+                    images_stack.append(self.visualize_reconstruction(gt_points, coord, faces[j].cpu().numpy(), image, lc=lc[i], w = width[i], h = height[i]))
         return torch.from_numpy(np.concatenate(images_stack, 1))

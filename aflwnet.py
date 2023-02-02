@@ -5,6 +5,7 @@ import config
 
 import numpy as np
 import torch
+import PIL.Image
 
 import torchvision.transforms as transforms
 
@@ -43,6 +44,7 @@ class AFLW2000(Dataset):
         img_path =  self.file_root + "/AFLW2000/"+ filename
         data_path = self.file_root + "/AFLW2000/"+ filename[:-4] + ".txt"
         crop_path = self.file_root + "/AFLW2000/"+ filename[:-4] + "_crop.txt"
+        nme_path =  self.file_root + "/nme/"+ filename[:-4] + ".txt"
 
         data = np.loadtxt(data_path, delimiter=",") #现在还是numpy_array
         #torch.from_numpy()
@@ -56,21 +58,26 @@ class AFLW2000(Dataset):
         # pts, normals是np.array
         
         crop = np.loadtxt(crop_path, delimiter=",")
+        nme = np.loadtxt(nme_path).astype(np.float32).item()
         lc = np.array([crop[0].astype(np.float32),crop[1].astype(np.float32),0])
 
-        img = io.imread(img_path)#137*137*4，α channel 不透明度
+        # img = io.imread(img_path)#137*137*4，α channel 不透明度
+        img = PIL.Image.open(img_path)
         # img[np.where(img[:, :, 3] == 0)] = 255# why ==0 to 255?? if have values, it ranges in 0-255
         # img现在是np.array
-        image_width, image_height, _ = img.shape
+        image_width, image_height = img.size
+        # img_copy = io.imread(img_path_original)
 
         #resize
         if self.resize_with_constant_border:
             img = transform.resize(img, (config.IMG_SIZE, config.IMG_SIZE),
                                        mode='constant', anti_aliasing=False)  # to match behavior of old version,224*224
         else:
-            img = transform.resize(img, (config.IMG_SIZE, config.IMG_SIZE))
+            # img = transform.resize(img, (config.IMG_SIZE, config.IMG_SIZE))
+            img = transforms.Resize(256)(img)
+            img = transforms.CenterCrop(224)(img)
 
-        img = img.astype(np.float32) #4个channels
+        img = np.array(img,dtype = np.float32) #4个channels
         
         #to_tensor
         img = torch.from_numpy(np.transpose(img, (2, 0, 1)))
@@ -91,6 +98,7 @@ class AFLW2000(Dataset):
             "image_width":image_width,
             "image_height":image_height,
             "left_corner":lc,
+            "nme":nme
         }
 
     def __len__(self):
@@ -114,7 +122,7 @@ def get_aflw_collate(num_points):#num_points = 20000
         if not all_equal:
             for t in batch:
                 pts, normal, weights = t["points"], t["normals"], t["weights"]
-                sample_numbers = [1500,2000,4500]
+                sample_numbers = [11000,4000,3000]
                 choices = []
                 for i, sample_number in enumerate(sample_numbers):
                     indices = []

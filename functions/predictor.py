@@ -58,11 +58,12 @@ class Predictor(CheckpointRunner):
             height = input_batch["image_height"]
             # predict with model
             out = self.model(images, lc, width, height)
-            self.save_inference_results(input_batch, out)
+            return out
+            # self.save_inference_results(input_batch, out)
 
     def predict(self):
         self.logger.info("Running predictions...")
-
+        # outlist = []
         predict_data_loader = DataLoader(self.dataset,
                                          batch_size=self.options.test.batch_size,
                                          pin_memory=self.options.pin_memory,
@@ -75,7 +76,8 @@ class Predictor(CheckpointRunner):
                 # Send input to GPU
                 batch = {k: v.cuda() if isinstance(v, torch.Tensor) else v for k, v in batch.items()}
 
-            self.predict_step(batch)
+            out = self.predict_step(batch)
+            return out
 
     def save_inference_results(self, inputs, outputs):
         if self.options.model.name == "pixel2mesh":
@@ -88,6 +90,8 @@ class Predictor(CheckpointRunner):
                 mesh_center = np.mean(outputs["pred_coord_before_deform"][0][i].cpu().numpy(), 0)
                 verts = [outputs["pred_coord"][k][i].cpu().numpy() for k in range(4)]
                 lc = lcc[i].cpu().numpy()
+                w = width[i].cpu().numpy()
+                h = height[i].cpu().numpy()
                 for k, vert in enumerate(verts):
                     meshname = basename + ".%d.obj" % (k + 1)
                     vert_v = np.hstack((np.full([vert.shape[0], 1], "v"), vert))
@@ -113,16 +117,18 @@ class Predictor(CheckpointRunner):
                         ret = image
                         for k, vert in enumerate(verts):
                             vert = rot_matrix.dot((vert - mesh_center).T).T + mesh_center
-                            rend_result = self.renderer.visualize_reconstruction(None,
-                                                                                 vert + \
-                                                                                 np.array(
-                                                                                     self.options.dataset.mesh_pos),
-                                                                                 self.ellipsoid.faces[k],
-                                                                                 image,
-                                                                                 mesh_only=False,
-                                                                                 color=color,
-                                                                                 lc=lc)
-                            ret = np.concatenate((ret, rend_result), axis=2)
+                            # rend_result = self.renderer.visualize_reconstruction(None,
+                            #                                                      vert + \
+                            #                                                      np.array(
+                            #                                                          self.options.dataset.mesh_pos),
+                            #                                                      self.ellipsoid.faces[k],
+                            #                                                      image,
+                            #                                                      mesh_only=False,
+                            #                                                      color=color,
+                            #                                                      lc=lc,
+                            #                                                      w= w,
+                            #                                                      h =h)
+                            # ret = np.concatenate((ret, rend_result), axis=2)
                             verts[k] = vert
                         ret = np.transpose(ret, (1, 2, 0))
                         writer.append_data((255 * ret).astype(np.uint8))

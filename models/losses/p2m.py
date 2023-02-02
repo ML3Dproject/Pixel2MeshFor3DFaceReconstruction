@@ -90,7 +90,7 @@ class P2MLoss(nn.Module):
         """
 
         chamfer_loss, edge_loss, normal_loss, lap_loss, move_loss = 0., 0., 0., 0., 0.
-        lap_const = [2.5, 1.5, 1.,0.2]
+        lap_const = [0.2, 1.5, 1.2,1.]
 
         gt_coord, gt_normal, gt_images = targets["points"], targets["normals"], targets["images"]#the dataset has normals of each face
         pred_coord, pred_coord_before_deform = outputs["pred_coord"], outputs["pred_coord_before_deform"]#

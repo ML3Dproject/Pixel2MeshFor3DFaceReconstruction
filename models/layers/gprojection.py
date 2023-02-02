@@ -77,10 +77,10 @@ class GProjection(nn.Module):
         positions = 1000 * (inputs + torch.tensor(self.mesh_pos, device=inputs.device, dtype=torch.float)) - lc.unsqueeze(1).clone().detach().cuda().float()
         # width = torch.tensor(width, device=inputs.device, dtype=torch.float)
         # height = torch.tensor(height, device=inputs.device, dtype=torch.float)
-        width = width.unsqueeze(1).clone().detach().cuda().float()  - camera_c_offset[0]
-        height = height.unsqueeze(1).clone().detach().cuda().float()  - camera_c_offset[1]
-        w = positions[:, :, 0] / (width) * resolution[0]
-        h = positions[:, :, 1] / (height) * resolution[1]
+        width = width.unsqueeze(1).clone().detach().cuda().float() 
+        height = height.unsqueeze(1).clone().detach().cuda().float() 
+        w = positions[:, :, 0] / (width) * resolution[0] - camera_c_offset[0]
+        h = positions[:, :, 1] / (height) * resolution[1]  - camera_c_offset[1]
 
         if self.tensorflow_compatible:
             # to align with tensorflow

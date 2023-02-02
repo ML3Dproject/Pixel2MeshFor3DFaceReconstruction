@@ -14,8 +14,8 @@ options = edict()
 
 options.name = 'p2m'
 options.version = None
-options.num_workers = 1
-options.num_gpus = 3
+options.num_workers = 15
+options.num_gpus = 4
 options.pin_memory = True
 
 options.log_dir = "logs"
@@ -41,14 +41,14 @@ options.dataset.camera_f = [25., 25.]
 options.dataset.camera_c = [111.5, 111.5]
 options.dataset.mesh_pos = [0., 0., 0.]
 options.dataset.normalization = True
-options.dataset.num_classes = 13
+options.dataset.num_classes = 1
 
 options.dataset.shapenet = edict()
 options.dataset.shapenet.num_points = 20000
 options.dataset.shapenet.resize_with_constant_border = False
 
 options.dataset.predict = edict()
-options.dataset.predict.folder = "/tmp"
+options.dataset.predict.folder = "experiments/test_image"
 
 options.model = edict()
 options.model.name = "pixel2mesh"
@@ -70,18 +70,18 @@ options.loss = edict()
 options.loss.weights = edict()
 options.loss.weights.normal = 1.6e-4
 options.loss.weights.edge = 0.1
-options.loss.weights.laplace = 0.3
-options.loss.weights.move = 0.1
+options.loss.weights.laplace = 0.5
+options.loss.weights.move = 0.033
 options.loss.weights.constant = 1.
 options.loss.weights.chamfer = [0.5, 1., 1.,1.]
-options.loss.weights.chamfer_opposite = 1.
+options.loss.weights.chamfer_opposite = 0.55
 options.loss.weights.reconst = 0.
 
 options.train = edict()
-options.train.num_epochs = 5000
+options.train.num_epochs = 100
 options.train.batch_size = 1
-options.train.summary_steps = 1
-options.train.checkpoint_steps = 10000
+options.train.summary_steps = 10
+options.train.checkpoint_steps = 3000
 options.train.test_epochs = 1
 options.train.use_augmentation = True
 options.train.shuffle = True
@@ -97,10 +97,11 @@ options.optim = edict()
 options.optim.name = "adam"
 options.optim.adam_beta1 = 0.9
 options.optim.sgd_momentum = 0.9
-options.optim.lr = 5.0E-5
+options.optim.lr = 0.0001 
+#5.0E-5
 options.optim.wd = 1.0E-6
-options.optim.lr_step = [30, 45]
-options.optim.lr_factor = 0.1
+options.optim.lr_step = [30,45,60,75]
+options.optim.lr_factor = 0.3
 
 
 
