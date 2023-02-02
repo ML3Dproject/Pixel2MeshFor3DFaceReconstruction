@@ -1,6 +1,6 @@
 # Pixel2Mesh for 3D Face Reconstrcution
 
-This is an implementation of Pixel2Mesh in PyTorch. Besides, we also:
+This is an implement of Pixel2Mesh for 3D Face Reconstruction. Our repository is based on the pytorch version of Pixel2Mesh in PyTorch of this.
 
 - Provide retrained Pixel2Mesh checkpoints. Besides, the pretrained tensorflow pretrained model provided in [official implementation](https://github.com/nywang16/Pixel2Mesh) is also converted into a PyTorch checkpoint file for convenience.
 - Provide a modified version of Pixel2Mesh whose backbone is ResNet instead of VGG.
