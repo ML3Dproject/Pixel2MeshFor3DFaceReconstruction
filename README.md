@@ -1,10 +1,12 @@
 # Pixel2Mesh for 3D Face Reconstrcution
 
-This is an implement of Pixel2Mesh for 3D Face Reconstruction. Our repository is based on the pytorch version of Pixel2Mesh in PyTorch of this.
+This is an implement of Pixel2Mesh for 3D Face Reconstruction. Our repository is based on the pytorch version of Pixel2Mesh in PyTorch of [this](https://github.com/noahcao/Pixel2Mesh).
 
-- Provide retrained Pixel2Mesh checkpoints. Besides, the pretrained tensorflow pretrained model provided in [official implementation](https://github.com/nywang16/Pixel2Mesh) is also converted into a PyTorch checkpoint file for convenience.
-- Provide a modified version of Pixel2Mesh whose backbone is ResNet instead of VGG.
-- Clarify some details in previous implementation and provide a flexible training framework.
+#Our Work
+
+- Some targeted structural improvements have been made for the use of 3d face datasets.
+- Train the model on the AFLW2000-3D dataset.
+- Add some data preprocess method for 3d face dataset.
 
 
 
@@ -18,38 +20,29 @@ Current version only supports training and inference on GPU. It works well under
 - Python 3.7
 - PyTorch 1.1
 - CUDA 9.0 (10.0 should also work)
-- OpenCV 4.1
-- Scipy 1.3
-- Scikit-Image 0.15
 
-Some minor dependencies are also needed, for which the latest version provided by conda/pip works well:
+Other conda environments can be found in the `requirements.txt`
 
-> easydict, pyyaml, tensorboardx, trimesh, shapely
-
-Two another steps to prepare the codebase:
+After you have created and install the related dependencies, you should also done:
 
 1. `git submodule update --init` to get [Neural Renderer](https://github.com/daniilidis-group/neural_renderer) ready.
 2. `python setup.py install` in directory [external/chamfer](external/chamfer) and `external/neural_renderer` to compile the modules.
 
 ### Datasets
 
-We use [ShapeNet](https://www.shapenet.org/) for model training and evaluation. The official tensorflow implementation provides a subset of ShapeNet for it, you can download it [here](https://drive.google.com/drive/folders/131dH36qXCabym1JjSmEpSQZg4dmZVQid). Extract it and link it to `data_tf` directory as follows. Before that, some meta files [here](https://drive.google.com/file/d/16d9druvCpsjKWsxHmsTD5HSOWiCWtDzo/view?usp=sharing) will help you establish the folder tree, demonstrated as follows.
+We use [AFLW2000-3D](https://www.shapenet.org/) for model training and evaluation.You should organize your 'datasets' as following trees.
 
-~~*P.S. In case more data is needed, another larger data package of ShapeNet is also [available](https://drive.google.com/file/d/1Z8gt4HdPujBNFABYrthhau9VZW10WWYe/view). You can extract it and place it in the `data` directory. But this would take much time and needs about 300GB storage.*~~
-
-P.S.S. For the larger data package, we provide a temporal access here on [OneDrive](https://1drv.ms/u/s!AtMVLfbdnqr4nGZjQ8GuPHlEUSg9?e=0dIEbK).
-
-```
 datasets/data
-├── ellipsoid
-│   ├── face1.obj
-│   ├── face2.obj
-│   ├── face3.obj
-│   └── info_ellipsoid.dat
+├── semi-sphere
+│   ├── semi1.obj
+│   ├── semi2.obj
+│   ├── semi3.obj
+|   ├── semi4.obj
+│   └── semi.dat
 ├── pretrained
 │   ... (.pth files)
-└── shapenet
-    ├── data (larger data package, optional)
+└── AFLW2000-3D
+    ├── AFLW2000
     │   ├── 02691156
     │   │   └── 3a123ae34379ea6871a70be9f12ce8b0_02.dat
     │   ├── 02828884
@@ -60,15 +53,12 @@ datasets/data
     │   ├── 02828884
     │   └── ...
     └── meta
+    └── nme
+    
         ...
 ```
 
-Difference between the two versions of dataset is worth some explanation:
-
-- `data_tf` has images of 137x137 resolution and four channels (RGB + alpha), 175,132 samples for training and 43,783 for evaluation.
-- `data` has RGB images of 224x224 resolution with background set all white. It contains altogether 1,050,240 for training and evaluation.
-
-*P.S. We trained model with both datasets and evaluated on both benchmarks. To save time and align our results with the official paper/implementation, we use `data_tf` by default.*
+Some information about the datasets:
 
 ### Usage
 
