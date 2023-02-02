@@ -31,7 +31,7 @@ After you have created and install the related dependencies, you should also don
 ### Datasets
 
 We use [AFLW2000-3D](https://www.shapenet.org/) for model training and evaluation.You should organize your 'datasets' as following trees.
-
+```
 datasets/data
 ├── semi-sphere
 │   ├── semi1.obj
