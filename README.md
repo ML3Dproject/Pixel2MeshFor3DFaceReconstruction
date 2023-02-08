@@ -44,16 +44,9 @@ datasets/data
 │   ... (.pth files)
 └── AFLW2000-3D
     ├── AFLW2000
-    │   ├── 02691156
-    │   │   └── 3a123ae34379ea6871a70be9f12ce8b0_02.dat
-    │   ├── 02828884
-    │   └── ...
-    ├── data_tf (standard data used in official implementation)
-    │   ├── 02691156 (put the folders directly in data_tf)
-    │   │   └── 10115655850468db78d106ce0a280f87
-    │   ├── 02828884
     │   └── ...
     └── meta
+    └── nme
         ...
 ```
 
@@ -61,7 +54,7 @@ datasets/data
 
 - You can find our pre-processing AFLW2000-3D dataset [here](https://drive.google.com/file/d/1MKINKNRMQHitbQeM-yoqJppidUdFrVrB/view?usp=sharing).
 - You can find our checkpoint [here](https://drive.google.com/file/d/1nEfYK0EfWyPJcfeuPvBKyDJWKI_dvbzF/view?usp=sharing).
-- You can find pytorch-author's checkpoint [here](https://drive.google.com/file/d/1pZm_IIWDUDje6gRZHW-GDhx5FCDM2Qg_/view?usp=sharing)
+- You can find pytorch-author's checkpoint [here](https://drive.google.com/file/d/1pZm_IIWDUDje6gRZHW-GDhx5FCDM2Qg_/view?usp=sharing).
 
 ### Usage
 
