@@ -16,3 +16,4 @@ easydict
 pyyaml
 tensorboardx
 shapely
+opencv-python
