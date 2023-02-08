@@ -31,7 +31,7 @@ After you have created and install the related dependencies, you should also don
 2. `python setup.py install` in directory [external/chamfer](external/chamfer) and `external/neural_renderer` to compile the modules.
 
 ### Datasets
-We use [AFLW2000-3D](http://www.cbsr.ia.ac.cn/users/xiangyuzhu/projects/3DDFA/main.htm) for model training and evaluation.You should organize your 'datasets' as following trees.
+We use [AFLW2000-3D](http://www.cbsr.ia.ac.cn/users/xiangyuzhu/projects/3DDFA/main.htm) for model training and evaluation.You should organize your [datasets](datasets) as following trees.
 ```
 datasets/data
 ├── semi-sphere
