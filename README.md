@@ -1,20 +1,22 @@
 # Pixel2Mesh for 3D Face Reconstrcution
 
+## Abstraction
+Pixel2mesh is an end-to-end deep learning architecture that generates 3D triangular meshes from single-color images. The majority of previous works represent 3D shapes in volumes or point clouds, while the Pixel2Mesh network represents 3D shapes in meshes, which are essentially well graph suited for graph-based convolutional neural networks. Besides, this network has considerable potential to be applied in specific domains. Our group is committed to adapting pixel2mesh in the field of face generation and improving its performance through a series of optimizations. 
+
 This is an implement of Pixel2Mesh for 3D Face Reconstruction. Our repository is based on the pytorch version of Pixel2Mesh in PyTorch of [this](https://github.com/noahcao/Pixel2Mesh).
 
 #Our Work
 
-- Some targeted structural improvements have been made for the use of 3d face datasets.
-- Train the model on the AFLW2000-3D dataset.
-- Add some data preprocess method for 3d face dataset.
-
+- Focus on face reconstruction instead of  general object reconstruction.
+- Improve the baseline model.
+- Ablation study within our model and compare related criteria with original P2M.
 
 
 ## Get Started
 
 ### Environment
 
-Current version only supports training and inference on GPU. It works well under dependencies as follows:
+Current version only supports training and inference on GPU. It works well under dependencies as follows(must):
 
 - Ubuntu 16.04 / 18.04
 - Python 3.7
@@ -29,8 +31,7 @@ After you have created and install the related dependencies, you should also don
 2. `python setup.py install` in directory [external/chamfer](external/chamfer) and `external/neural_renderer` to compile the modules.
 
 ### Datasets
-
-We use [AFLW2000-3D](https://www.shapenet.org/) for model training and evaluation.You should organize your 'datasets' as following trees.
+We use [AFLW2000-3D](http://www.cbsr.ia.ac.cn/users/xiangyuzhu/projects/3DDFA/main.htm) for model training and evaluation.You should organize your 'datasets' as following trees.
 ```
 datasets/data
 ├── semi-sphere
@@ -58,6 +59,10 @@ datasets/data
 
 Some information about the datasets:
 
+You can find our pre-processing AFLW2000-3D dataset [here](https://drive.google.com/file/d/1MKINKNRMQHitbQeM-yoqJppidUdFrVrB/view?usp=sharing).
+You can find our checkpoint [here](https://drive.google.com/file/d/1nEfYK0EfWyPJcfeuPvBKyDJWKI_dvbzF/view?usp=sharing).
+You can find pytorch-author's checkpoint [here](https://drive.google.com/file/d/1pZm_IIWDUDje6gRZHW-GDhx5FCDM2Qg_/view?usp=sharing)
+
 ### Usage
 
 #### Configuration
@@ -84,6 +89,8 @@ python entrypoint_eval.py --name xxx --options path/to/yml --checkpoint path/to/
 
 #### Inference
 
+We recommand to use our jupyternotebook in the files.
+
 You can do inference on your own images by a simple command:
 
 ``` 
@@ -92,89 +99,13 @@ python entrypoint_predict.py --options /path/to/yml --checkpoint /path/to/checkp
 
 *P.S. we only support do training/evaluation/inference with GPU by default.*
 
-## Results
-
-We tested performance of some models. The [official tensorflow implementation](https://github.com/nywang16/Pixel2Mesh) reports much higher performance than claimed in the [original paper](https://arxiv.org/abs/1804.01654) as follows. The results are listed as follows, which is close to that reported in [MeshRCNN](https://arxiv.org/abs/1906.02739).  The original paper evaluates result on simple mean, without considerations of different categories containing different number of samples, while some later papers use weighted-mean. We report results under both two metrics for caution.
-
-<table>
-  <thead>
-    <tr>
-      <th>Checkpoint</th>
-      <th>Eval Protocol
-      <th>CD</th>
-      <th>F1<sup>τ</sup></th>
-      <th>F1<sup>2τ</sup></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td rowspan=2>Official Pretrained (tensorflow)</td>
-      <td>Mean</td>
-      <td>0.482</td>
-      <td>65.22</td>
-      <td>78.80</td>
-    </tr>
-    <tr>
-      <td>Weighted-mean</td>
-      <td>0.439</td>
-      <td><b>66.56</b></td>
-      <td><b>80.17</b></td>
-    </tr>
-    <tr>
-      <td rowspan=2>Migrated Checkpoint</td>
-      <td>Mean</td>
-      <td>0.498</td>
-      <td>64.21</td>
-      <td>78.03</td>
-    </tr>
-    <tr>
-      <td>Weighted-mean</td>
-      <td>0.451</td>
-      <td>65.67</td>
-      <td>79.51</td>
-    </tr>
-    <tr>
-      <td rowspan=2>ResNet</td>
-      <td>Mean</td>
-      <td><b>0.443</b></td>
-      <td><b>65.36</b></td>
-      <td><b>79.24</b></td>
-    </tr>
-    <tr>
-      <td>Weighted-mean</td>
-      <td><b>0.411</b></td>
-      <td>66.13</td>
-      <td>80.13</td>
-    </tr>
-  </tbody> 
-</table>
-
-*P.S. Due to time limit, the resnet checkpoint has not been trained in detail and sufficiently.*
-
-### Pretrained checkpoints
-
-- **VGG backbone:** The checkpoint converted from official pretrained model  (based on VGG) can be downloaded [here](https://drive.google.com/file/d/1Gk3M4KQekEenG9qQm60OFsxNar0sG8bN/view?usp=sharing). (scripts to migrate tensorflow checkpoints into `.pth` are available in `utils/migrations`. )
-- **ResNet backbone:** As we provide another backbone choice of resenet, we also provide a corresponding checkpoint [here](https://drive.google.com/file/d/1pZm_IIWDUDje6gRZHW-GDhx5FCDM2Qg_/view?usp=sharing). 
 
 ## Details of Improvement
 
-We explain some improvement of this version of implementation compared with the official version here.
-
-- **Larger batch size:** We support larger batch size on multiple GPUs for training. Since Chamfer distances cannot be calculated if samples in a batch with different ground-truth pointcloud size, "resizing" the pointcloud is necessary. Instead of resampling points, we simply upsample/downsample from the dataset.
-- **Better backbone:** We enable replacing VGG by ResNet50 for model backbone. The training progress is more stable and final performance is higher.
-- **More stable training:** We do normalization on the deformed sphere, so that it's deformed at location $(0,0,0)$; we use a threshold activation on $z$-axis during projection, so that $z$ will always be positive or negative and never be $0$. These seem not to result in better performance but more stable training loss.
-
-## Demo
-
-Generated mesh samples are provided in [datasets/examples](datasets/examples) from our ResNet model. Three mesh models in a line are deformed from a single ellipsoid mesh with different number of vertices (156 vs 268 vs 2466) as configurated in the original paper. 
-
-![](datasets/examples/airplane.gif)
-
-![](datasets/examples/lamp.gif)
-
-![](datasets/examples/table.gif)
-
-![](datasets/examples/display.gif)
+Compared with data in ShapeNet dataset, in this human face dataset:
+- 1.2D images are more noisy; 
+- 2.3D point clouds contain more points and show more details. 
+Due to these points as well as different topologies of 3D point clouds, we introduce a preprocessing network for denoising, add one more deformation process,  enabling our network be able to predict more details, and use semi-sphere as initial reference to match the new topology. Furthermore, we change the fixed graph unpooling to adaptive unpooling, which can accelerate training process.
 
 ## Acknowledgements
 
