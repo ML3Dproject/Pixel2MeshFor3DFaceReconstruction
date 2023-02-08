@@ -5,7 +5,7 @@ Pixel2mesh is an end-to-end deep learning architecture that generates 3D triangu
 
 This is an implement of Pixel2Mesh for 3D Face Reconstruction. Our repository is based on the pytorch version of Pixel2Mesh in PyTorch of [this](https://github.com/noahcao/Pixel2Mesh).
 
-#Our Work
+## Our Work
 
 - Focus on face reconstruction instead of  general object reconstruction.
 - Improve the baseline model.
@@ -57,11 +57,11 @@ datasets/data
         ...
 ```
 
-Some information about the datasets:
+### Our resources
 
-You can find our pre-processing AFLW2000-3D dataset [here](https://drive.google.com/file/d/1MKINKNRMQHitbQeM-yoqJppidUdFrVrB/view?usp=sharing).
-You can find our checkpoint [here](https://drive.google.com/file/d/1nEfYK0EfWyPJcfeuPvBKyDJWKI_dvbzF/view?usp=sharing).
-You can find pytorch-author's checkpoint [here](https://drive.google.com/file/d/1pZm_IIWDUDje6gRZHW-GDhx5FCDM2Qg_/view?usp=sharing)
+- You can find our pre-processing AFLW2000-3D dataset [here](https://drive.google.com/file/d/1MKINKNRMQHitbQeM-yoqJppidUdFrVrB/view?usp=sharing).
+- You can find our checkpoint [here](https://drive.google.com/file/d/1nEfYK0EfWyPJcfeuPvBKyDJWKI_dvbzF/view?usp=sharing).
+- You can find pytorch-author's checkpoint [here](https://drive.google.com/file/d/1pZm_IIWDUDje6gRZHW-GDhx5FCDM2Qg_/view?usp=sharing)
 
 ### Usage
 
@@ -89,7 +89,8 @@ python entrypoint_eval.py --name xxx --options path/to/yml --checkpoint path/to/
 
 #### Inference
 
-We recommand to use our jupyternotebook in the files.
+We recommand to use our jupyternotebook `yu_predict.ipynb` in the folder [Jupyter_simplify_file](Jupyter_simplify_file). And the file shold be removed outside.
+
 
 You can do inference on your own images by a simple command:
 
@@ -109,4 +110,4 @@ Due to these points as well as different topologies of 3D point clouds, we intro
 
 ## Acknowledgements
 
-Our work is based on the official version of [Pixel2Mesh](https://github.com/nywang16/Pixel2Mesh); Some part of code are borrowed from [a previous PyTorch implementation of Pixel2Mesh](https://github.com/Tong-ZHAO/Pixel2Mesh-Pytorch). The packed files for two version of datasets are also provided by them two. Most codework is done by [Yuge Zhang](https://github.com/ultmaster).
+Our work is based on the official version of [Pixel2Mesh](https://github.com/noahcao/Pixel2Mesh); And thanks for authors of this [paper](https://www.sciencedirect.com/science/article/pii/S131915782200413X) to provide useful but not open-source information. Sincere thanks all of people helped us!
