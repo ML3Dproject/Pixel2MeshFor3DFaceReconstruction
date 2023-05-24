@@ -1,4 +1,4 @@
-# Pixel2Mesh for 3D Face Reconstruction
+# Pixel2Mesh for 3D Human Face Reconstruction
 
 ## Abstraction
 Pixel2mesh is an end-to-end deep learning architecture that generates 3D triangular meshes from single-color images. The majority of previous works represent 3D shapes in volumes or point clouds, while the Pixel2Mesh network represents 3D shapes in meshes, which are essentially well graph suited for graph-based convolutional neural networks. Besides, this network has considerable potential to be applied in specific domains. Our group is committed to adapting pixel2mesh in the field of face generation and improving its performance through a series of optimizations. 
